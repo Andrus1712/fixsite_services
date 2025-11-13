@@ -16,7 +16,7 @@ export class AuthService {
         private readonly tenantService: TenantService,
     ) { }
 
-    async register({ password, email, name }: RegisterDto) {
+    async register({ password, email, name, username }: RegisterDto) {
         const user = await this.userService.findOneByEmail(email);
 
         if (user) {
@@ -29,6 +29,7 @@ export class AuthService {
             name,
             email,
             password: hashedPassword,
+            username
         });
 
         return {
