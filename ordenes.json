@@ -1,0 +1,749 @@
+[
+    {
+        "id": 1,
+        "order_code": "SUC1-041025-1",
+        "description": "fallo de dispositivo android",
+        "device_data": {
+            "device_id": 1,
+            "device_name": "Galaxy S10",
+            "device_type": 1,
+            "device_type_description": "smartphone",
+            "device_brand": 1,
+            "device_brand_type": "Samsung",
+            "serial_number": "SM-G973F123456789",
+            "imei": "123456789012345",
+            "model_year": "2019",
+            "color": "Prism Black",
+            "storage_capacity": "128GB"
+        },
+        "issue_info": {
+            "issue_id": 1,
+            "issue_name": "No enciende",
+            "issue_description": "El dispositivo no enciende al presionar el botón de encendido",
+            "issue_type": 1,
+            "issue_type_description": "hardware",
+            "issue_severity": 3,
+            "issue_severity_description": "high",
+            "issue_reproducibility": 1,
+            "issue_reproducibility_description": "always",
+            "issue_frequency": 1,
+            "issue_frequency_description": "always",
+            "issue_impact": 3,
+            "issue_impact_description": "high",
+            "issue_difficulty": 2,
+            "issue_difficulty_description": "medium",
+            "issue_priority": 3,
+            "issue_priority_description": "high",
+            "issue_urgency": 3,
+            "issue_urgency_description": "high",
+            "issue_detection": 1,
+            "issue_detection_description": "immediate",
+            "issue_reported_by": "customer",
+            "issue_reported_date": "2025-10-01",
+            "issue_reported_time": "10:00",
+            "issue_additional_info": "El dispositivo se cayó al suelo antes de que esto ocurriera",
+            "issue_screenshots": [
+                "https://example.com/screenshot1.jpg",
+                "https://example.com/screenshot2.jpg"
+            ],
+            "issue_videos": [
+                "https://example.com/video1.mp4"
+            ],
+            "issue_logs": [
+                "https://example.com/log1.txt"
+            ],
+            "issue_attachments": [
+                "https://example.com/attachment1.pdf"
+            ],
+            "issue_steps_to_reproduce": [
+                "Intentar encender el dispositivo presionando el botón de encendido",
+                "Mantener presionado por 10 segundos",
+                "Conectar cargador y repetir"
+            ],
+            "issue_environment": "Uso normal, sin aplicaciones sospechosas",
+            "issue_additional_notes": "Cliente reporta que el dispositivo funcionaba correctamente hasta la caída",
+            "issue_tags": [
+                "urgent",
+                "customer-complaint",
+                "physical-damage"
+            ],
+            "issue_custom_fields": {
+                "warranty_status": "in warranty",
+                "purchase_date": "2024-10-01",
+                "damage_type": "accidental",
+                "liquid_damage": false
+            },
+            "issue_related_orders": [
+                "SUC1-041025-2"
+            ]
+        },
+        "status": 2,
+        "status_description": "in_progress",
+        "priority": 3,
+        "priority_description": "high",
+        "customer_id": 1,
+        "customer_data": {
+            "customer_id": 1,
+            "customer_name": "Juan Perez",
+            "customer_email": "juan.perez@email.com",
+            "customer_phone": "999999999",
+            "customer_address": "Av. Siempre Viva 123",
+            "customer_city": "Springfield",
+            "customer_country": "USA",
+            "customer_type": "individual",
+            "preferred_contact": "phone"
+        },
+        "assigned_technician_id": 2,
+        "technician_data": {
+            "assigned_technician_id": 2,
+            "assigned_technician_name": "Carlos Rodriguez",
+            "assigned_technician_email": "carlos.rodriguez@company.com",
+            "assigned_technician_phone": "888888888",
+            "assigned_technician_specialty": "Mobile Hardware",
+            "technician_level": "senior",
+            "certification": "Samsung Certified"
+        },
+        "cost_info": {
+            "estimated_cost": 150.00,
+            "actual_cost": null,
+            "labor_cost": 80.00,
+            "parts_cost": 70.00,
+            "currency": "USD",
+            "cost_approved": false,
+            "quote_valid_until": "2025-10-15"
+        },
+        "timeline": {
+            "estimated_completion": "2025-10-08",
+            "actual_completion": null,
+            "estimated_hours": 4,
+            "actual_hours": null,
+            "sla_deadline": "2025-10-10"
+        },
+        "parts_needed": [
+            {
+                "part_id": "BATT-GS10-001",
+                "part_name": "Battery Galaxy S10",
+                "quantity": 1,
+                "cost": 45.00,
+                "availability": "in_stock"
+            },
+            {
+                "part_id": "CHRG-GS10-001",
+                "part_name": "Charging Port Galaxy S10",
+                "quantity": 1,
+                "cost": 25.00,
+                "availability": "order_required"
+            }
+        ],
+        "status_history": [
+            {
+                "status": "pending",
+                "timestamp": "2025-10-04T10:00:00Z",
+                "changed_by": "system",
+                "notes": "Orden creada"
+            },
+            {
+                "status": "in_progress",
+                "timestamp": "2025-10-04T14:30:00Z",
+                "changed_by": "Carlos Rodriguez",
+                "notes": "Iniciando diagnóstico"
+            }
+        ],
+        "notes": [
+            {
+                "id": 1,
+                "author": "Carlos Rodriguez",
+                "timestamp": "2025-10-04T15:00:00Z",
+                "content": "Dispositivo recibido. Batería completamente descargada. Iniciando pruebas.",
+                "type": "diagnostic"
+            }
+        ],
+        "createdAt": "2025-10-04T10:00:00Z",
+        "updatedAt": "2025-10-04T15:00:00Z"
+    },
+    {
+        "id": 2,
+        "order_code": "SUC1-041025-2",
+        "description": "Pantalla rota iPhone 13",
+        "device_data": {
+            "device_id": 2,
+            "device_name": "iPhone 13",
+            "device_type": 1,
+            "device_type_description": "smartphone",
+            "device_brand": 2,
+            "device_brand_type": "Apple",
+            "serial_number": "F2LN3456789ABC",
+            "imei": "987654321098765",
+            "model_year": "2021",
+            "color": "Blue",
+            "storage_capacity": "256GB"
+        },
+        "issue_info": {
+            "issue_id": 2,
+            "issue_name": "Pantalla agrietada",
+            "issue_description": "La pantalla tiene múltiples grietas que afectan la funcionalidad táctil",
+            "issue_type": 2,
+            "issue_type_description": "screen",
+            "issue_severity": 2,
+            "issue_severity_description": "medium",
+            "issue_reproducibility": 1,
+            "issue_reproducibility_description": "always",
+            "issue_frequency": 1,
+            "issue_frequency_description": "always",
+            "issue_impact": 2,
+            "issue_impact_description": "medium",
+            "issue_difficulty": 1,
+            "issue_difficulty_description": "easy",
+            "issue_priority": 2,
+            "issue_priority_description": "medium",
+            "issue_urgency": 2,
+            "issue_urgency_description": "medium",
+            "issue_detection": 1,
+            "issue_detection_description": "immediate",
+            "issue_reported_by": "customer",
+            "issue_reported_date": "2025-10-03",
+            "issue_reported_time": "16:30",
+            "issue_additional_info": "Se cayó desde una mesa de aproximadamente 1 metro",
+            "issue_screenshots": [
+                "https://example.com/iphone-crack1.jpg",
+                "https://example.com/iphone-crack2.jpg"
+            ],
+            "issue_videos": [],
+            "issue_logs": [],
+            "issue_attachments": [],
+            "issue_steps_to_reproduce": [
+                "Tocar diferentes áreas de la pantalla",
+                "Verificar respuesta táctil"
+            ],
+            "issue_environment": "Uso doméstico normal",
+            "issue_additional_notes": "El resto del dispositivo funciona correctamente",
+            "issue_tags": [
+                "screen-repair",
+                "physical-damage"
+            ],
+            "issue_custom_fields": {
+                "warranty_status": "out of warranty",
+                "purchase_date": "2022-01-15",
+                "damage_type": "accidental",
+                "liquid_damage": false
+            },
+            "issue_related_orders": []
+        },
+        "status": 4,
+        "status_description": "completed",
+        "priority": 2,
+        "priority_description": "medium",
+        "customer_id": 2,
+        "customer_data": {
+            "customer_id": 2,
+            "customer_name": "Maria Garcia",
+            "customer_email": "maria.garcia@email.com",
+            "customer_phone": "777777777",
+            "customer_address": "Calle Principal 456",
+            "customer_city": "Madrid",
+            "customer_country": "Spain",
+            "customer_type": "individual",
+            "preferred_contact": "email"
+        },
+        "assigned_technician_id": 1,
+        "technician_data": {
+            "assigned_technician_id": 1,
+            "assigned_technician_name": "Ana Martinez",
+            "assigned_technician_email": "ana.martinez@company.com",
+            "assigned_technician_phone": "666666666",
+            "assigned_technician_specialty": "Screen Repair",
+            "technician_level": "expert",
+            "certification": "Apple Certified"
+        },
+        "cost_info": {
+            "estimated_cost": 280.00,
+            "actual_cost": 275.00,
+            "labor_cost": 100.00,
+            "parts_cost": 175.00,
+            "currency": "USD",
+            "cost_approved": true,
+            "quote_valid_until": "2025-10-10"
+        },
+        "timeline": {
+            "estimated_completion": "2025-10-05",
+            "actual_completion": "2025-10-05T18:00:00Z",
+            "estimated_hours": 2,
+            "actual_hours": 1.5,
+            "sla_deadline": "2025-10-08"
+        },
+        "parts_needed": [
+            {
+                "part_id": "SCRN-IP13-001",
+                "part_name": "iPhone 13 Screen Assembly",
+                "quantity": 1,
+                "cost": 175.00,
+                "availability": "in_stock"
+            }
+        ],
+        "status_history": [
+            {
+                "status": "pending",
+                "timestamp": "2025-10-03T16:30:00Z",
+                "changed_by": "system",
+                "notes": "Orden creada"
+            },
+            {
+                "status": "in_progress",
+                "timestamp": "2025-10-04T09:00:00Z",
+                "changed_by": "Ana Martinez",
+                "notes": "Iniciando reparación de pantalla"
+            },
+            {
+                "status": "waiting_parts",
+                "timestamp": "2025-10-04T10:00:00Z",
+                "changed_by": "Ana Martinez",
+                "notes": "Esperando llegada de pantalla"
+            },
+            {
+                "status": "in_progress",
+                "timestamp": "2025-10-05T14:00:00Z",
+                "changed_by": "Ana Martinez",
+                "notes": "Pantalla recibida, continuando reparación"
+            },
+            {
+                "status": "completed",
+                "timestamp": "2025-10-05T18:00:00Z",
+                "changed_by": "Ana Martinez",
+                "notes": "Reparación completada exitosamente"
+            }
+        ],
+        "notes": [
+            {
+                "id": 1,
+                "author": "Ana Martinez",
+                "timestamp": "2025-10-04T09:15:00Z",
+                "content": "Pantalla severamente dañada pero digitalizador funcional. Reemplazo completo necesario.",
+                "type": "diagnostic"
+            },
+            {
+                "id": 2,
+                "author": "Ana Martinez",
+                "timestamp": "2025-10-05T18:00:00Z",
+                "content": "Reparación completada. Pantalla nueva instalada y probada. Funcionalidad 100% restaurada.",
+                "type": "completion"
+            }
+        ],
+        "createdAt": "2025-10-03T16:30:00Z",
+        "updatedAt": "2025-10-05T18:00:00Z"
+    },
+    {
+        "id": 3,
+        "order_code": "SUC1-041025-3",
+        "description": "Laptop lenta y sobrecalentamiento",
+        "device_data": {
+            "device_id": 3,
+            "device_name": "ThinkPad X1 Carbon",
+            "device_type": 2,
+            "device_type_description": "laptop",
+            "device_brand": 3,
+            "device_brand_type": "Lenovo",
+            "serial_number": "PC123456789",
+            "imei": null,
+            "model_year": "2020",
+            "color": "Black",
+            "storage_capacity": "512GB SSD"
+        },
+        "issue_info": {
+            "issue_id": 3,
+            "issue_name": "Rendimiento lento y sobrecalentamiento",
+            "issue_description": "La laptop funciona muy lenta y se calienta excesivamente durante uso normal",
+            "issue_type": 3,
+            "issue_type_description": "performance",
+            "issue_severity": 2,
+            "issue_severity_description": "medium",
+            "issue_reproducibility": 1,
+            "issue_reproducibility_description": "always",
+            "issue_frequency": 1,
+            "issue_frequency_description": "always",
+            "issue_impact": 3,
+            "issue_impact_description": "high",
+            "issue_difficulty": 2,
+            "issue_difficulty_description": "medium",
+            "issue_priority": 2,
+            "issue_priority_description": "medium",
+            "issue_urgency": 3,
+            "issue_urgency_description": "high",
+            "issue_detection": 2,
+            "issue_detection_description": "gradual",
+            "issue_reported_by": "customer",
+            "issue_reported_date": "2025-10-02",
+            "issue_reported_time": "14:00",
+            "issue_additional_info": "El problema ha empeorado en las últimas semanas",
+            "issue_screenshots": [
+                "https://example.com/task-manager.jpg"
+            ],
+            "issue_videos": [],
+            "issue_logs": [
+                "https://example.com/system-log.txt"
+            ],
+            "issue_attachments": [],
+            "issue_steps_to_reproduce": [
+                "Encender la laptop",
+                "Abrir múltiples aplicaciones",
+                "Observar lentitud y calentamiento"
+            ],
+            "issue_environment": "Uso de oficina, múltiples aplicaciones simultáneas",
+            "issue_additional_notes": "Cliente usa la laptop para trabajo de diseño gráfico",
+            "issue_tags": [
+                "performance",
+                "overheating",
+                "business-critical"
+            ],
+            "issue_custom_fields": {
+                "warranty_status": "extended warranty",
+                "purchase_date": "2020-03-15",
+                "damage_type": "wear",
+                "liquid_damage": false
+            },
+            "issue_related_orders": []
+        },
+        "status": 1,
+        "status_description": "pending",
+        "priority": 2,
+        "priority_description": "medium",
+        "customer_id": 3,
+        "customer_data": {
+            "customer_id": 3,
+            "customer_name": "Roberto Silva",
+            "customer_email": "roberto.silva@company.com",
+            "customer_phone": "555555555",
+            "customer_address": "Av. Tecnológica 789",
+            "customer_city": "São Paulo",
+            "customer_country": "Brazil",
+            "customer_type": "business",
+            "preferred_contact": "email"
+        },
+        "assigned_technician_id": null,
+        "technician_data": null,
+        "cost_info": {
+            "estimated_cost": null,
+            "actual_cost": null,
+            "labor_cost": null,
+            "parts_cost": null,
+            "currency": "USD",
+            "cost_approved": false,
+            "quote_valid_until": null
+        },
+        "timeline": {
+            "estimated_completion": null,
+            "actual_completion": null,
+            "estimated_hours": null,
+            "actual_hours": null,
+            "sla_deadline": "2025-10-09"
+        },
+        "parts_needed": [],
+        "status_history": [
+            {
+                "status": "pending",
+                "timestamp": "2025-10-02T14:00:00Z",
+                "changed_by": "system",
+                "notes": "Orden creada - pendiente de asignación"
+            }
+        ],
+        "notes": [],
+        "createdAt": "2025-10-02T14:00:00Z",
+        "updatedAt": "2025-10-02T14:00:00Z"
+    },
+    {
+        "id": 4,
+        "order_code": "SUC1-041025-4",
+        "description": "Tablet no carga",
+        "device_data": {
+            "device_id": 4,
+            "device_name": "iPad Air",
+            "device_type": 3,
+            "device_type_description": "tablet",
+            "device_brand": 2,
+            "device_brand_type": "Apple",
+            "serial_number": "DMPH2345678901",
+            "imei": null,
+            "model_year": "2022",
+            "color": "Space Gray",
+            "storage_capacity": "64GB"
+        },
+        "issue_info": {
+            "issue_id": 4,
+            "issue_name": "No carga la batería",
+            "issue_description": "El dispositivo no carga cuando se conecta el cable",
+            "issue_type": 4,
+            "issue_type_description": "charging",
+            "issue_severity": 3,
+            "issue_severity_description": "high",
+            "issue_reproducibility": 1,
+            "issue_reproducibility_description": "always",
+            "issue_frequency": 1,
+            "issue_frequency_description": "always",
+            "issue_impact": 3,
+            "issue_impact_description": "high",
+            "issue_difficulty": 2,
+            "issue_difficulty_description": "medium",
+            "issue_priority": 3,
+            "issue_priority_description": "high",
+            "issue_urgency": 3,
+            "issue_urgency_description": "high",
+            "issue_detection": 1,
+            "issue_detection_description": "immediate",
+            "issue_reported_by": "customer",
+            "issue_reported_date": "2025-10-05",
+            "issue_reported_time": "11:30",
+            "issue_additional_info": "Probó con diferentes cables y cargadores",
+            "issue_screenshots": [],
+            "issue_videos": [],
+            "issue_logs": [],
+            "issue_attachments": [],
+            "issue_steps_to_reproduce": [
+                "Conectar cable de carga",
+                "Verificar que no aparece indicador de carga"
+            ],
+            "issue_environment": "Uso doméstico",
+            "issue_additional_notes": "Batería actualmente al 5%",
+            "issue_tags": [
+                "urgent",
+                "charging-issue",
+                "battery"
+            ],
+            "issue_custom_fields": {
+                "warranty_status": "in warranty",
+                "purchase_date": "2023-08-20",
+                "damage_type": "unknown",
+                "liquid_damage": false
+            },
+            "issue_related_orders": []
+        },
+        "status": 3,
+        "status_description": "waiting_parts",
+        "priority": 3,
+        "priority_description": "high",
+        "customer_id": 4,
+        "customer_data": {
+            "customer_id": 4,
+            "customer_name": "Laura Thompson",
+            "customer_email": "laura.thompson@email.com",
+            "customer_phone": "444444444",
+            "customer_address": "Oak Street 321",
+            "customer_city": "Toronto",
+            "customer_country": "Canada",
+            "customer_type": "individual",
+            "preferred_contact": "phone"
+        },
+        "assigned_technician_id": 3,
+        "technician_data": {
+            "assigned_technician_id": 3,
+            "assigned_technician_name": "Mike Johnson",
+            "assigned_technician_email": "mike.johnson@company.com",
+            "assigned_technician_phone": "333333333",
+            "assigned_technician_specialty": "Tablet Repair",
+            "technician_level": "intermediate",
+            "certification": "Apple Certified"
+        },
+        "cost_info": {
+            "estimated_cost": 120.00,
+            "actual_cost": null,
+            "labor_cost": 60.00,
+            "parts_cost": 60.00,
+            "currency": "USD",
+            "cost_approved": true,
+            "quote_valid_until": "2025-10-12"
+        },
+        "timeline": {
+            "estimated_completion": "2025-10-10",
+            "actual_completion": null,
+            "estimated_hours": 3,
+            "actual_hours": null,
+            "sla_deadline": "2025-10-12"
+        },
+        "parts_needed": [
+            {
+                "part_id": "CHRG-IPAD-001",
+                "part_name": "iPad Air Charging Port",
+                "quantity": 1,
+                "cost": 60.00,
+                "availability": "order_required"
+            }
+        ],
+        "status_history": [
+            {
+                "status": "pending",
+                "timestamp": "2025-10-05T11:30:00Z",
+                "changed_by": "system",
+                "notes": "Orden creada"
+            },
+            {
+                "status": "in_progress",
+                "timestamp": "2025-10-05T15:00:00Z",
+                "changed_by": "Mike Johnson",
+                "notes": "Iniciando diagnóstico"
+            },
+            {
+                "status": "waiting_parts",
+                "timestamp": "2025-10-05T16:30:00Z",
+                "changed_by": "Mike Johnson",
+                "notes": "Puerto de carga defectuoso, ordenando repuesto"
+            }
+        ],
+        "notes": [
+            {
+                "id": 1,
+                "author": "Mike Johnson",
+                "timestamp": "2025-10-05T16:30:00Z",
+                "content": "Diagnóstico completado. Puerto de carga dañado, necesita reemplazo. Parte ordenada.",
+                "type": "diagnostic"
+            }
+        ],
+        "createdAt": "2025-10-05T11:30:00Z",
+        "updatedAt": "2025-10-05T16:30:00Z"
+    },
+    {
+        "id": 5,
+        "order_code": "SUC1-041025-5",
+        "description": "Smartwatch no sincroniza",
+        "device_data": {
+            "device_id": 5,
+            "device_name": "Galaxy Watch 4",
+            "device_type": 4,
+            "device_type_description": "smartwatch",
+            "device_brand": 1,
+            "device_brand_type": "Samsung",
+            "serial_number": "GW4123456789",
+            "imei": null,
+            "model_year": "2021",
+            "color": "Silver",
+            "storage_capacity": "16GB"
+        },
+        "issue_info": {
+            "issue_id": 5,
+            "issue_name": "Problemas de sincronización",
+            "issue_description": "El smartwatch no sincroniza datos con el teléfono",
+            "issue_type": 5,
+            "issue_type_description": "software",
+            "issue_severity": 1,
+            "issue_severity_description": "low",
+            "issue_reproducibility": 2,
+            "issue_reproducibility_description": "often",
+            "issue_frequency": 2,
+            "issue_frequency_description": "often",
+            "issue_impact": 1,
+            "issue_impact_description": "low",
+            "issue_difficulty": 1,
+            "issue_difficulty_description": "easy",
+            "issue_priority": 1,
+            "issue_priority_description": "low",
+            "issue_urgency": 1,
+            "issue_urgency_description": "low",
+            "issue_detection": 2,
+            "issue_detection_description": "gradual",
+            "issue_reported_by": "customer",
+            "issue_reported_date": "2025-10-06",
+            "issue_reported_time": "09:15",
+            "issue_additional_info": "Funciona intermitentemente",
+            "issue_screenshots": [],
+            "issue_videos": [],
+            "issue_logs": [],
+            "issue_attachments": [],
+            "issue_steps_to_reproduce": [
+                "Intentar sincronizar datos de salud",
+                "Verificar conexión Bluetooth",
+                "Revisar aplicación móvil"
+            ],
+            "issue_environment": "Uso deportivo diario",
+            "issue_additional_notes": "Problema comenzó después de actualización",
+            "issue_tags": [
+                "software",
+                "sync-issue",
+                "bluetooth"
+            ],
+            "issue_custom_fields": {
+                "warranty_status": "in warranty",
+                "purchase_date": "2023-05-10",
+                "damage_type": "software",
+                "liquid_damage": false
+            },
+            "issue_related_orders": []
+        },
+        "status": 5,
+        "status_description": "ready_for_pickup",
+        "priority": 1,
+        "priority_description": "low",
+        "customer_id": 5,
+        "customer_data": {
+            "customer_id": 5,
+            "customer_name": "David Kim",
+            "customer_email": "david.kim@email.com",
+            "customer_phone": "222222222",
+            "customer_address": "Tech Avenue 654",
+            "customer_city": "Seoul",
+            "customer_country": "South Korea",
+            "customer_type": "individual",
+            "preferred_contact": "email"
+        },
+        "assigned_technician_id": 4,
+        "technician_data": {
+            "assigned_technician_id": 4,
+            "assigned_technician_name": "Sarah Chen",
+            "assigned_technician_email": "sarah.chen@company.com",
+            "assigned_technician_phone": "111111111",
+            "assigned_technician_specialty": "Software & Wearables",
+            "technician_level": "junior",
+            "certification": "Samsung Certified"
+        },
+        "cost_info": {
+            "estimated_cost": 0.00,
+            "actual_cost": 0.00,
+            "labor_cost": 0.00,
+            "parts_cost": 0.00,
+            "currency": "USD",
+            "cost_approved": true,
+            "quote_valid_until": null
+        },
+        "timeline": {
+            "estimated_completion": "2025-10-06",
+            "actual_completion": "2025-10-06T17:00:00Z",
+            "estimated_hours": 1,
+            "actual_hours": 0.5,
+            "sla_deadline": "2025-10-13"
+        },
+        "parts_needed": [],
+        "status_history": [
+            {
+                "status": "pending",
+                "timestamp": "2025-10-06T09:15:00Z",
+                "changed_by": "system",
+                "notes": "Orden creada"
+            },
+            {
+                "status": "in_progress",
+                "timestamp": "2025-10-06T13:00:00Z",
+                "changed_by": "Sarah Chen",
+                "notes": "Iniciando diagnóstico de software"
+            },
+            {
+                "status": "completed",
+                "timestamp": "2025-10-06T16:30:00Z",
+                "changed_by": "Sarah Chen",
+                "notes": "Reset de fábrica y reconfiguración completada"
+            },
+            {
+                "status": "ready_for_pickup",
+                "timestamp": "2025-10-06T17:00:00Z",
+                "changed_by": "Sarah Chen",
+                "notes": "Dispositivo listo para entrega"
+            }
+        ],
+        "notes": [
+            {
+                "id": 1,
+                "author": "Sarah Chen",
+                "timestamp": "2025-10-06T16:30:00Z",
+                "content": "Problema resuelto con reset de fábrica y reconfiguración. Sincronización funcionando correctamente.",
+                "type": "completion"
+            }
+        ],
+        "createdAt": "2025-10-06T09:15:00Z",
+        "updatedAt": "2025-10-06T17:00:00Z"
+    }
+]
