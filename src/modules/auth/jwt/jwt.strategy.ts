@@ -5,6 +5,8 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserService } from "src/modules/user/user.service";
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { Request } from 'express';
+import { cookieConfig } from '../../../config/cookie.config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -14,7 +16,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     ) {
         super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: ExtractJwt.fromExtractors([
+                (request: Request) => {
+                    return request?.cookies?.[cookieConfig.accessToken.name];
+                },
+                ExtractJwt.fromAuthHeaderAsBearerToken()
+            ]),
             ignoreExpiration: false,
             secretOrKey: configService.get('JWT_SECRET'),
         });

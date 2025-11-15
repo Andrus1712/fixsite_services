@@ -72,19 +72,19 @@ export class AuthService {
         const allPermissions = [...userPermissions, ...rolePermissions];
         const allModules = [...userModules, ...roleModules];
 
-        // Generar token temporal (sin tenant específico)
-        const tempPayload = {
+        // Generar token de acceso completo (sin tenant específico inicialmente)
+        const payload = {
             username: user.username,
             sub: user.id,
             email: user.email,
-            type: 'temp'
+            tenantId: null, // Sin tenant inicialmente
+            type: 'full'
         };
 
-        const tempToken = this.jwtService.sign(tempPayload, { expiresIn: '15m' });
-
+        const accessToken = this.jwtService.sign(payload, { expiresIn: '24h' });
 
         return {
-            _token: tempToken,
+            accessToken,
             user,
             tenants: userTenants.map(t => ({
                 id: t.id,
@@ -165,8 +165,8 @@ export class AuthService {
         // const allPermissions = [...userPermissions, ...rolePermissions];
         // const allModules = [...userModules, ...roleModules];
 
-        // Generar token final con tenant incluido
-        const finalPayload = {
+        // Generar token con tenant específico
+        const payload = {
             username: user?.username,
             sub: user?.id,
             email: user?.email,
@@ -174,11 +174,11 @@ export class AuthService {
             type: 'full'
         };
 
-        const finalToken = this.jwtService.sign(finalPayload, { expiresIn: '24h' });
+        const accessToken = this.jwtService.sign(payload, { expiresIn: '24h' });
 
         return {
-            _token: finalToken,
-            user,
+            accessToken: accessToken,
+            // user,
             tenants: userTenants.map(t => ({
                 id: t.id,
                 name: t.name,
@@ -247,18 +247,19 @@ export class AuthService {
         // Obtener tenants disponibles para el usuario
         const userTenants = await this.tenantService.getUserTenats(userId.toString());
         
-        // Generar token temporal (sin tenant específico)
-        const tempPayload = { 
+        // Generar token sin tenant específico
+        const payload = { 
             username, 
             sub: userId, 
             email,
-            type: 'temp' 
+            tenantId: null,
+            type: 'full' 
         };
         
-        const tempToken = this.jwtService.sign(tempPayload, { expiresIn: '15m' });
+        const accessToken = this.jwtService.sign(payload, { expiresIn: '24h' });
         
         return {
-            tempToken,
+            accessToken,
             user: {
                 id: userId,
                 username,
@@ -271,54 +272,96 @@ export class AuthService {
             }))
         };
     }
+
+    async getProfile(userId: string, tenantId?: string) {
+        const user = await this.userService.findOne(userId);
+        
+        if (!user) {
+            throw new UnauthorizedException('Usuario no encontrado');
+        }
+        
+        const userTenants = await this.tenantService.getUserTenats(userId);
+        const userPermissions = await this.permissionService.getUserPermissions(userId);
+        const userModules = await this.permissionService.getUserModules(userId);
+        const userRoles = await this.permissionService.getUserRoles(userId);
+        const roleIds = userRoles.map(role => role.id);
+
+        const rolePermissions = roleIds.length > 0 ? await this.permissionService.getRolePermissions(roleIds) : [];
+        const roleModules = roleIds.length > 0 ? await this.permissionService.getRoleModules(roleIds) : [];
+
+        const allPermissions = [...userPermissions, ...rolePermissions];
+        const allModules = [...userModules, ...roleModules];
+
+        return {
+            user: {
+                id: user.id,
+                name: user.name,
+                username: user.username,
+                email: user.email,
+                isActive: user.isActive,
+                createdAt: user.createdAt.toISOString(),
+                updatedAt: user.updatedAt.toISOString(),
+            },
+            roles: userRoles.map(role => ({
+                id: parseInt(role.id),
+                name: role.name,
+                description: role.description,
+                active: role.active,
+                createdAt: role.createdAt.toISOString(),
+                updatedAt: role.updatedAt.toISOString(),
+            })),
+            permission: allPermissions.map(p => ({
+                id: p.id,
+                userId: user.id,
+                componentId: p.component.id,
+                assignedBy: p.assignedBy,
+                componentKey: p.component.componentKey,
+                option: p.component.option,
+                action: p.component.action,
+                createdAt: p.createdAt.toISOString(),
+                updatedAt: p.updatedAt.toISOString(),
+                label: p.component.label,
+                title: p.component.title,
+                path: p.component.path,
+                icon: p.component.icon,
+                order: p.component.order,
+                showMenu: p.component.showMenu,
+                active: p.component.active,
+            })),
+            modules: allModules.map(m => ({
+                id: parseInt(m.id),
+                label: m.name,
+                title: m.name,
+                moduleKey: m.name,
+                icon: m.icon,
+                order: 1,
+                active: m.active,
+                createdAt: m.createdAt.toISOString(),
+                updatedAt: m.updatedAt.toISOString(),
+                components: m.components.filter(c => c.showMenu && c.active).map(c => ({
+                    id: parseInt(c.id),
+                    label: c.label,
+                    title: c.title,
+                    componentKey: c.componentKey,
+                    option: c.option,
+                    action: c.action,
+                    path: c.path,
+                    icon: c.icon,
+                    order: c.order,
+                    showMenu: c.showMenu,
+                    active: c.active,
+                    createdAt: c.createdAt.toISOString(),
+                    updatedAt: c.updatedAt.toISOString(),
+                })),
+            })),
+            tenants: userTenants.map(t => ({
+                id: parseInt(t.id),
+                name: t.name,
+                subdomain: t.subdomain,
+                databaseName: t.databaseName,
+            })),
+            tenantId
+        };
+    }
 }
 
-interface LoginResponse {
-    _token: string,
-    user: {
-        id: number,
-        name: string,
-        username: string,
-        email: string,
-        isActive: boolean,
-        createdAt: string,
-        updatedAt: string;
-    },
-    permission: [{
-        id: number,
-        userId: number,
-        componentId: number,
-        assignedBy: string,
-        componentKey: string,
-        option: string,
-        action: string,
-        createdAt: string,
-        updatedAt: string,
-    }],
-    modules: [{
-        id: number,
-        label: string,
-        title: string,
-        moduleKey: string,
-        icon: string,
-        order: number,
-        active: boolean,
-        createdAt: string,
-        updatedAt: string,
-        components: [{
-            id: number,
-            label: string,
-            title: string,
-            componentKey: string,
-            option: string,
-            action: string,
-            path: string,
-            icon: string,
-            order: number,
-            showMenu: boolean,
-            active: boolean,
-            createdAt: string,
-            updatedAt: string,
-        }];
-    }];
-}
