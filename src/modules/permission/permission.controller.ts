@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request, ForbiddenException, Query } from "@nestjs/common";
 import { PermissionService } from "./permission.service";
 import { TenantService } from "../tenant/tenant.service";
-import { TenantSelectionGuard } from "../auth/guards/tenant-selection.guard";
+import { FullTokenGuard } from "../auth/guards/full-token.guard";
 
 @Controller('permissions')
-@UseGuards(TenantSelectionGuard)
+@UseGuards(FullTokenGuard)
 export class PermissionController {
 
     constructor(private readonly permissionService: PermissionService,
@@ -18,8 +18,8 @@ export class PermissionController {
         @Request() req
     ) {
         const tenantId = req.user.tenantId || null;
-        const isFullToken = req.user.type === 'full';
-        const componentType = isFullToken ? 'T' : 'G';
+        // const isFullToken = req.user.type === 'full';
+        const componentType = tenantId ? 'T' : 'G';
 
         // Validar que el usuario solo pueda ver sus propios permisos o sea admin
         if (req.user.id !== Number(userId) && !req.user.isAdmin) {
@@ -341,7 +341,7 @@ export class PermissionController {
         return await this.permissionService.getAllPermissions(pageNum, limitNum, filter);
     }
 
-    @Get('permissions/:id')
+    @Get(':id')
     async getPermissionById(@Param('id') id: string) {
         return await this.permissionService.getPermissionById(parseInt(id));
     }
@@ -352,7 +352,7 @@ export class PermissionController {
         return await this.permissionService.createPermission(componentId, assignedBy);
     }
 
-    @Put('permissions/:id')
+    @Put(':id')
     async updatePermission(
         @Param('id') id: string,
         @Body() updatePermissionDto: { assignedBy: string; }
@@ -361,7 +361,7 @@ export class PermissionController {
         return await this.permissionService.updatePermission(parseInt(id), assignedBy);
     }
 
-    @Delete('permissions/:id')
+    @Delete(':id')
     async deletePermission(@Param('id') id: string) {
         return await this.permissionService.deletePermission(parseInt(id));
     }

@@ -1,5 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { SqlLogger } from './sql-logger.config';
 
 export const globalDatabaseConfig = registerAs(
   'globalDatabase',
@@ -13,5 +14,6 @@ export const globalDatabaseConfig = registerAs(
     entities: [__dirname + '/../entities/global/*.entity{.ts,.js}'],
     synchronize: process.env.GLOBAL_DB_SYNCHRONIZE === 'true',
     logging: process.env.GLOBAL_DB_LOGGING === 'true',
+    logger: process.env.GLOBAL_DB_LOGGING_FILE === 'true' ? new SqlLogger() : undefined,
   }),
 );

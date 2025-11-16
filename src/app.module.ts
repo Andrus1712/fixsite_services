@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { globalDatabaseConfig } from './config/database.config';
@@ -13,6 +14,7 @@ import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { TenantInitializerService } from './database/tenant-initializer.service';
 import { TenantConnectionService } from './database/tenant-connection.service';
+import { SqlContextInterceptor } from './common/interceptors/sql-context.interceptor';
 
 @Module({
   imports: [
@@ -60,6 +62,14 @@ import { TenantConnectionService } from './database/tenant-connection.service';
     OrderModule
   ],
   controllers: [AppController],
-  providers: [AppService, TenantConnectionService, TenantInitializerService],
+  providers: [
+    AppService, 
+    TenantConnectionService, 
+    TenantInitializerService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: SqlContextInterceptor,
+    }
+  ],
 })
 export class AppModule {}
