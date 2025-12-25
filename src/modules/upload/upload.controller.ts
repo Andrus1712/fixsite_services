@@ -78,7 +78,7 @@ export class UploadController {
       },
     }),
     fileFilter: (req, file, cb) => {
-      if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp|pdf|doc|docx)$/)) {
+      if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp|pdf|doc|docx|mp4)$/)) {
         return cb(new BadRequestException('Tipo de archivo no permitido'), false);
       }
       cb(null, true);

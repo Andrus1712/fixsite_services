@@ -10,6 +10,7 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { OrderModule } from './modules/order/order.module';
+import { InfoDevicesModule } from './modules/info-devices/info-devices.module';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { TenantInitializerService } from './database/tenant-initializer.service';
@@ -59,7 +60,8 @@ import { SqlContextInterceptor } from './common/interceptors/sql-context.interce
     UserModule,
     AuthModule,
     UploadModule,
-    OrderModule
+    OrderModule,
+    InfoDevicesModule
   ],
   controllers: [AppController],
   providers: [
