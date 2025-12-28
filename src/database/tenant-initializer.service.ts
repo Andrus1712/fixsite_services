@@ -26,6 +26,8 @@ export class TenantInitializerService implements OnModuleInit {
         await this.tenantConnectionService.getConnection(tenant);
         console.log(`[DEV] Tables initialized for tenant: ${tenant.name}`);
       } catch (error) {
+        console.log(error);
+        
         console.error(`[DEV] Failed to initialize tenant ${tenant.name}:`, error);
       }
     }

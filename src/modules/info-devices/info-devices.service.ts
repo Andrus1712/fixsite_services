@@ -1,27 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { DeviceType } from '../../entities/global/device-type.entity';
-import { DeviceBrand } from '../../entities/global/device-brand.entity';
-import { DeviceModel } from '../../entities/global/device-model.entity';
-import { PasswordType } from '../../entities/global/password-type.entity';
+import { DeviceType } from '../../entities/branch/device-type.entity';
+import { DeviceBrand } from '../../entities/branch/device-brand.entity';
+import { DeviceModel } from '../../entities/branch/device-model.entity';
+import { PasswordType } from '../../entities/branch/password-type.entity';
+import { TenantAwareService } from '../../database/tenant-aware.service';
+import { Tenant } from '../../entities/global/tenant.entity';
 
 @Injectable()
 export class InfoDevicesService {
   constructor(
-    @InjectRepository(DeviceType, 'globalConnection')
-    private readonly deviceTypeRepository: Repository<DeviceType>,
-    @InjectRepository(DeviceBrand, 'globalConnection')
-    private readonly deviceBrandRepository: Repository<DeviceBrand>,
-    @InjectRepository(DeviceModel, 'globalConnection')
-    private readonly deviceModelRepository: Repository<DeviceModel>,
-    @InjectRepository(PasswordType, 'globalConnection')
-    private readonly passwordTypeRepository: Repository<PasswordType>,
+    private readonly tenantAwareService: TenantAwareService,
   ) {}
 
   // Device Types
-  async getAllDeviceTypes(page: number = 1, limit: number = 10, filter?: string) {
-    const queryBuilder = this.deviceTypeRepository.createQueryBuilder('deviceType');
+  async getAllDeviceTypes(tenant: Tenant, page: number = 1, limit: number = 10, filter?: string) {
+    const deviceTypeRepository = await this.tenantAwareService.getRepository(DeviceType, tenant);
+    const queryBuilder = deviceTypeRepository.createQueryBuilder('deviceType');
     
     if (filter) {
       queryBuilder.where('deviceType.name LIKE :filter OR deviceType.description LIKE :filter', {
@@ -37,32 +32,38 @@ export class InfoDevicesService {
     return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  async findAllDeviceTypes() {
-    const [data, total] = await this.deviceTypeRepository.findAndCount();
+  async findAllDeviceTypes(tenant: Tenant) {
+    const deviceTypeRepository = await this.tenantAwareService.getRepository(DeviceType, tenant);
+    const [data, total] = await deviceTypeRepository.findAndCount();
     return { data, total, page: 1, limit: total, totalPages: 1 };
   }
 
-  async findOneDeviceType(id: string): Promise<DeviceType | null> {
-    return this.deviceTypeRepository.findOne({ where: { id } });
+  async findOneDeviceType(tenant: Tenant, id: string): Promise<DeviceType | null> {
+    const deviceTypeRepository = await this.tenantAwareService.getRepository(DeviceType, tenant);
+    return deviceTypeRepository.findOne({ where: { id } });
   }
 
-  async createDeviceType(data: Partial<DeviceType>): Promise<DeviceType> {
-    const deviceType = this.deviceTypeRepository.create(data);
-    return this.deviceTypeRepository.save(deviceType);
+  async createDeviceType(tenant: Tenant, data: Partial<DeviceType>): Promise<DeviceType> {
+    const deviceTypeRepository = await this.tenantAwareService.getRepository(DeviceType, tenant);
+    const deviceType = deviceTypeRepository.create(data);
+    return deviceTypeRepository.save(deviceType);
   }
 
-  async updateDeviceType(id: string, data: Partial<DeviceType>): Promise<DeviceType | null> {
-    await this.deviceTypeRepository.update(id, data);
-    return this.findOneDeviceType(id);
+  async updateDeviceType(tenant: Tenant, id: string, data: Partial<DeviceType>): Promise<DeviceType | null> {
+    const deviceTypeRepository = await this.tenantAwareService.getRepository(DeviceType, tenant);
+    await deviceTypeRepository.update(id, data);
+    return this.findOneDeviceType(tenant, id);
   }
 
-  async removeDeviceType(id: string): Promise<void> {
-    await this.deviceTypeRepository.delete(id);
+  async removeDeviceType(tenant: Tenant, id: string): Promise<void> {
+    const deviceTypeRepository = await this.tenantAwareService.getRepository(DeviceType, tenant);
+    await deviceTypeRepository.delete(id);
   }
 
   // Device Brands
-  async getAllDeviceBrands(page: number = 1, limit: number = 10, filter?: string) {
-    const queryBuilder = this.deviceBrandRepository.createQueryBuilder('deviceBrand');
+  async getAllDeviceBrands(tenant: Tenant, page: number = 1, limit: number = 10, filter?: string) {
+    const deviceBrandRepository = await this.tenantAwareService.getRepository(DeviceBrand, tenant);
+    const queryBuilder = deviceBrandRepository.createQueryBuilder('deviceBrand');
     
     if (filter) {
       queryBuilder.where('deviceBrand.name LIKE :filter OR deviceBrand.description LIKE :filter', {
@@ -78,32 +79,38 @@ export class InfoDevicesService {
     return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  async findAllDeviceBrands() {
-    const [data, total] = await this.deviceBrandRepository.findAndCount();
+  async findAllDeviceBrands(tenant: Tenant) {
+    const deviceBrandRepository = await this.tenantAwareService.getRepository(DeviceBrand, tenant);
+    const [data, total] = await deviceBrandRepository.findAndCount();
     return { data, total, page: 1, limit: total, totalPages: 1 };
   }
 
-  async findOneDeviceBrand(id: string): Promise<DeviceBrand | null> {
-    return this.deviceBrandRepository.findOne({ where: { id } });
+  async findOneDeviceBrand(tenant: Tenant, id: string): Promise<DeviceBrand | null> {
+    const deviceBrandRepository = await this.tenantAwareService.getRepository(DeviceBrand, tenant);
+    return deviceBrandRepository.findOne({ where: { id } });
   }
 
-  async createDeviceBrand(data: Partial<DeviceBrand>): Promise<DeviceBrand> {
-    const deviceBrand = this.deviceBrandRepository.create(data);
-    return this.deviceBrandRepository.save(deviceBrand);
+  async createDeviceBrand(tenant: Tenant, data: Partial<DeviceBrand>): Promise<DeviceBrand> {
+    const deviceBrandRepository = await this.tenantAwareService.getRepository(DeviceBrand, tenant);
+    const deviceBrand = deviceBrandRepository.create(data);
+    return deviceBrandRepository.save(deviceBrand);
   }
 
-  async updateDeviceBrand(id: string, data: Partial<DeviceBrand>): Promise<DeviceBrand | null> {
-    await this.deviceBrandRepository.update(id, data);
-    return this.findOneDeviceBrand(id);
+  async updateDeviceBrand(tenant: Tenant, id: string, data: Partial<DeviceBrand>): Promise<DeviceBrand | null> {
+    const deviceBrandRepository = await this.tenantAwareService.getRepository(DeviceBrand, tenant);
+    await deviceBrandRepository.update(id, data);
+    return this.findOneDeviceBrand(tenant, id);
   }
 
-  async removeDeviceBrand(id: string): Promise<void> {
-    await this.deviceBrandRepository.delete(id);
+  async removeDeviceBrand(tenant: Tenant, id: string): Promise<void> {
+    const deviceBrandRepository = await this.tenantAwareService.getRepository(DeviceBrand, tenant);
+    await deviceBrandRepository.delete(id);
   }
 
   // Device Models
-  async getAllDeviceModels(page: number = 1, limit: number = 10, filter?: string, brandId?: string, typeId?: string) {
-    const queryBuilder = this.deviceModelRepository.createQueryBuilder('deviceModel')
+  async getAllDeviceModels(tenant: Tenant, page: number = 1, limit: number = 10, filter?: string, brandId?: string, typeId?: string) {
+    const deviceModelRepository = await this.tenantAwareService.getRepository(DeviceModel, tenant);
+    const queryBuilder = deviceModelRepository.createQueryBuilder('deviceModel')
       .leftJoinAndSelect('deviceModel.deviceType', 'deviceType')
       .leftJoinAndSelect('deviceModel.deviceBrand', 'deviceBrand');
     
@@ -137,35 +144,41 @@ export class InfoDevicesService {
     return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  async findAllDeviceModels() {
-    const [data, total] = await this.deviceModelRepository.findAndCount({ relations: ['deviceType', 'deviceBrand'] });
+  async findAllDeviceModels(tenant: Tenant) {
+    const deviceModelRepository = await this.tenantAwareService.getRepository(DeviceModel, tenant);
+    const [data, total] = await deviceModelRepository.findAndCount({ relations: ['deviceType', 'deviceBrand'] });
     return { data, total, page: 1, limit: total, totalPages: 1 };
   }
 
-  async findOneDeviceModel(id: string): Promise<DeviceModel | null> {
-    return this.deviceModelRepository.findOne({ 
+  async findOneDeviceModel(tenant: Tenant, id: string): Promise<DeviceModel | null> {
+    const deviceModelRepository = await this.tenantAwareService.getRepository(DeviceModel, tenant);
+    return deviceModelRepository.findOne({ 
       where: { id }, 
       relations: ['deviceType', 'deviceBrand'] 
     });
   }
 
-  async createDeviceModel(data: Partial<DeviceModel>): Promise<DeviceModel> {
-    const deviceModel = this.deviceModelRepository.create(data);
-    return this.deviceModelRepository.save(deviceModel);
+  async createDeviceModel(tenant: Tenant, data: Partial<DeviceModel>): Promise<DeviceModel> {
+    const deviceModelRepository = await this.tenantAwareService.getRepository(DeviceModel, tenant);
+    const deviceModel = deviceModelRepository.create(data);
+    return deviceModelRepository.save(deviceModel);
   }
 
-  async updateDeviceModel(id: string, data: Partial<DeviceModel>): Promise<DeviceModel | null> {
-    await this.deviceModelRepository.update(id, data);
-    return this.findOneDeviceModel(id);
+  async updateDeviceModel(tenant: Tenant, id: string, data: Partial<DeviceModel>): Promise<DeviceModel | null> {
+    const deviceModelRepository = await this.tenantAwareService.getRepository(DeviceModel, tenant);
+    await deviceModelRepository.update(id, data);
+    return this.findOneDeviceModel(tenant, id);
   }
 
-  async removeDeviceModel(id: string): Promise<void> {
-    await this.deviceModelRepository.delete(id);
+  async removeDeviceModel(tenant: Tenant, id: string): Promise<void> {
+    const deviceModelRepository = await this.tenantAwareService.getRepository(DeviceModel, tenant);
+    await deviceModelRepository.delete(id);
   }
 
   // Password Types
-  async getAllPasswordTypes(page: number = 1, limit: number = 10, filter?: string) {
-    const queryBuilder = this.passwordTypeRepository.createQueryBuilder('passwordType');
+  async getAllPasswordTypes(tenant: Tenant, page: number = 1, limit: number = 10, filter?: string) {
+    const passwordTypeRepository = await this.tenantAwareService.getRepository(PasswordType, tenant);
+    const queryBuilder = passwordTypeRepository.createQueryBuilder('passwordType');
     
     if (filter) {
       queryBuilder.where('passwordType.name LIKE :filter OR passwordType.description LIKE :filter', {
@@ -181,26 +194,31 @@ export class InfoDevicesService {
     return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  async findAllPasswordTypes() {
-    const [data, total] = await this.passwordTypeRepository.findAndCount();
+  async findAllPasswordTypes(tenant: Tenant) {
+    const passwordTypeRepository = await this.tenantAwareService.getRepository(PasswordType, tenant);
+    const [data, total] = await passwordTypeRepository.findAndCount();
     return { data, total, page: 1, limit: total, totalPages: 1 };
   }
 
-  async findOnePasswordType(id: string): Promise<PasswordType | null> {
-    return this.passwordTypeRepository.findOne({ where: { id } });
+  async findOnePasswordType(tenant: Tenant, id: string): Promise<PasswordType | null> {
+    const passwordTypeRepository = await this.tenantAwareService.getRepository(PasswordType, tenant);
+    return passwordTypeRepository.findOne({ where: { id } });
   }
 
-  async createPasswordType(data: Partial<PasswordType>): Promise<PasswordType> {
-    const passwordType = this.passwordTypeRepository.create(data);
-    return this.passwordTypeRepository.save(passwordType);
+  async createPasswordType(tenant: Tenant, data: Partial<PasswordType>): Promise<PasswordType> {
+    const passwordTypeRepository = await this.tenantAwareService.getRepository(PasswordType, tenant);
+    const passwordType = passwordTypeRepository.create(data);
+    return passwordTypeRepository.save(passwordType);
   }
 
-  async updatePasswordType(id: string, data: Partial<PasswordType>): Promise<PasswordType | null> {
-    await this.passwordTypeRepository.update(id, data);
-    return this.findOnePasswordType(id);
+  async updatePasswordType(tenant: Tenant, id: string, data: Partial<PasswordType>): Promise<PasswordType | null> {
+    const passwordTypeRepository = await this.tenantAwareService.getRepository(PasswordType, tenant);
+    await passwordTypeRepository.update(id, data);
+    return this.findOnePasswordType(tenant, id);
   }
 
-  async removePasswordType(id: string): Promise<void> {
-    await this.passwordTypeRepository.delete(id);
+  async removePasswordType(tenant: Tenant, id: string): Promise<void> {
+    const passwordTypeRepository = await this.tenantAwareService.getRepository(PasswordType, tenant);
+    await passwordTypeRepository.delete(id);
   }
 }

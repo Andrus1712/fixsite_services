@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
-import { DeviceType } from '../entities/global/device-type.entity';
-import { DeviceBrand } from '../entities/global/device-brand.entity';
-import { PasswordType } from '../entities/global/password-type.entity';
+import { DeviceType } from '../entities/branch/device-type.entity';
+import { DeviceBrand } from '../entities/branch/device-brand.entity';
+import { PasswordType } from '../entities/branch/password-type.entity';
 
 export async function seedDeviceData(dataSource: DataSource) {
   const deviceTypeRepository = dataSource.getRepository(DeviceType);

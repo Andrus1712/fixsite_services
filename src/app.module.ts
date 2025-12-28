@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { globalDatabaseConfig } from './config/database.config';
@@ -16,6 +17,9 @@ import * as winston from 'winston';
 import { TenantInitializerService } from './database/tenant-initializer.service';
 import { TenantConnectionService } from './database/tenant-connection.service';
 import { SqlContextInterceptor } from './common/interceptors/sql-context.interceptor';
+import { TenantResolverMiddleware } from './common/middleware/tenant-resolver.middleware';
+import { Tenant } from './entities/global/tenant.entity';
+import { MaintenanceModule } from './modules/maintenance/maintenance.module';
 
 @Module({
   imports: [
@@ -56,22 +60,46 @@ import { SqlContextInterceptor } from './common/interceptors/sql-context.interce
       useFactory: globalDatabaseConfig,
       inject: [globalDatabaseConfig.KEY],
     }),
+    TypeOrmModule.forFeature([Tenant], 'globalConnection'),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'defaultSecret',
+      signOptions: { expiresIn: '24h' },
+    }),
     TenantModule,
     UserModule,
     AuthModule,
     UploadModule,
     OrderModule,
-    InfoDevicesModule
+    InfoDevicesModule,
+    MaintenanceModule
   ],
   controllers: [AppController],
   providers: [
-    AppService, 
-    TenantConnectionService, 
+    AppService,
+    TenantConnectionService,
     TenantInitializerService,
+    TenantResolverMiddleware,
     {
       provide: APP_INTERCEPTOR,
       useClass: SqlContextInterceptor,
     }
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(TenantResolverMiddleware)
+      .exclude(
+        'auth/*path',
+        'tenant/*path',
+        'upload/*path',
+        { path: '/', method: RequestMethod.GET },
+      )
+      .forRoutes(
+        'info-devices/*path',
+        'failures/*path',
+        'order/*path',
+        'user/*path',
+      );
+  }
+}

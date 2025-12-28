@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { TenantService } from './tenant.service';
-import { CurrentTenant } from '../../common/decorators/tenant.decorator';
 import { Tenant } from '../../entities/global/tenant.entity';
+import { TenantId } from 'src/common/decorators/tenant-id.decorator';
 
 interface CreateTenantDto {
   name: string;
@@ -14,7 +14,7 @@ interface CreateTenantDto {
 
 @Controller('tenants')
 export class TenantController {
-  constructor(private readonly tenantService: TenantService) {}
+  constructor(private readonly tenantService: TenantService) { }
 
   @Post()
   async createTenant(@Body() createTenantDto: CreateTenantDto) {
@@ -33,7 +33,7 @@ export class TenantController {
   }
 
   @Get('current')
-  getCurrentTenant(@CurrentTenant() tenant: Tenant) {
+  getCurrentTenant(@TenantId() tenant: Tenant) {
     return tenant;
   }
 }

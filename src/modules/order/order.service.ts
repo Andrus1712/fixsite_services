@@ -123,7 +123,6 @@ export class OrderService {
     }
     
     const tenant = await this.tenantRepository.findOne({ where: { id: tenantId } });
-    console.log({tenant});
     
     if (!tenant) {
       throw new Error(`Tenant with ID ${tenantId} not found`);

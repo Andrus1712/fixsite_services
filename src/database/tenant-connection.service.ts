@@ -20,7 +20,7 @@ export class TenantConnectionService {
       host: tenant.dbHost,
       port: tenant.dbPort,
       username: tenant.dbUsername,
-      password: String(tenant.dbPassword || ''),
+      password: tenant.dbPassword ? String(tenant.dbPassword) : '',
       database: tenant.databaseName,
       entities: Object.values(branchEntities),
       synchronize: true,
@@ -30,7 +30,7 @@ export class TenantConnectionService {
 
     const connection = new DataSource(connectionOptions);
     await connection.initialize();
-    
+
     this.connections.set(tenant.id, connection);
     return connection;
   }
