@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Tenant } from '../../entities/global/tenant.entity';
-import { TenantConnectionService } from '../../database/tenant-connection.service';
+import { ConnectionDatabaseService } from '../../database/connection-database.service';
 
 interface CreateTenantDto {
   name: string;
@@ -18,7 +18,7 @@ export class TenantService {
   constructor(
     @InjectRepository(Tenant, 'globalConnection')
     private readonly tenantRepository: Repository<Tenant>,
-    private readonly tenantConnectionService: TenantConnectionService,
+    private readonly tenantConnectionService: ConnectionDatabaseService,
   ) { }
 
   async createTenant(createTenantDto: CreateTenantDto): Promise<Tenant> {
@@ -71,18 +71,18 @@ export class TenantService {
 
   async getAllTenants(page: number, limit: number, filter?: string) {
     const queryBuilder = this.tenantRepository.createQueryBuilder('tenant');
-    
+
     if (filter) {
       queryBuilder.where('tenant.name ILIKE :filter OR tenant.subdomain ILIKE :filter', {
         filter: `%${filter}%`
       });
     }
-    
+
     const [tenants, total] = await queryBuilder
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
-    
+
     return {
       data: tenants,
       total,

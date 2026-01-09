@@ -23,7 +23,7 @@ export class TenantResolverMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     const tenantIdentifier = this.extractTenantIdentifier(req);
-    
+
     if (!tenantIdentifier) {
       throw new BadRequestException('Tenant identifier is required');
     }

@@ -14,12 +14,12 @@ import { OrderModule } from './modules/order/order.module';
 import { InfoDevicesModule } from './modules/info-devices/info-devices.module';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
-import { TenantInitializerService } from './database/tenant-initializer.service';
-import { TenantConnectionService } from './database/tenant-connection.service';
+import { ConnectionDatabaseService } from './database/connection-database.service';
 import { SqlContextInterceptor } from './common/interceptors/sql-context.interceptor';
 import { TenantResolverMiddleware } from './common/middleware/tenant-resolver.middleware';
 import { Tenant } from './entities/global/tenant.entity';
 import { MaintenanceModule } from './modules/maintenance/maintenance.module';
+import { ConnectionModule } from './database/conecction.module';
 
 @Module({
   imports: [
@@ -65,6 +65,7 @@ import { MaintenanceModule } from './modules/maintenance/maintenance.module';
       secret: process.env.JWT_SECRET || 'defaultSecret',
       signOptions: { expiresIn: '24h' },
     }),
+    ConnectionModule,
     TenantModule,
     UserModule,
     AuthModule,
@@ -76,14 +77,13 @@ import { MaintenanceModule } from './modules/maintenance/maintenance.module';
   controllers: [AppController],
   providers: [
     AppService,
-    TenantConnectionService,
-    TenantInitializerService,
     TenantResolverMiddleware,
     {
       provide: APP_INTERCEPTOR,
       useClass: SqlContextInterceptor,
     }
   ],
+  exports: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
@@ -98,8 +98,9 @@ export class AppModule implements NestModule {
       .forRoutes(
         'info-devices/*path',
         'failures/*path',
-        'order/*path',
         'user/*path',
+        'maintenance/*path',
+        'orders/*path'
       );
   }
 }

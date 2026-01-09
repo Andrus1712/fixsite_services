@@ -8,7 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt/jwt.strategy';
 import { PermissionModule } from '../permission/permission.module';
 import { TenantModule } from '../tenant/tenant.module';
-import { TenantRequiredGuard } from './guards/tenant-required.guard';
+import { TenantSelectionGuard } from './guards/tenant-selection.guard';
 import { FullTokenGuard } from './guards/full-token.guard';
 
 @Module({
@@ -28,7 +28,7 @@ import { FullTokenGuard } from './guards/full-token.guard';
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, JwtStrategy, TenantRequiredGuard, FullTokenGuard],
-    exports: [TenantRequiredGuard, FullTokenGuard]
+    providers: [AuthService, JwtStrategy, TenantSelectionGuard, FullTokenGuard],
+    exports: [TenantSelectionGuard, FullTokenGuard]
 })
 export class AuthModule { }

@@ -9,6 +9,9 @@ export class Issue {
   @Column()
   issue_name: string;
 
+  @Column()
+  issue_code: string;
+
   @Column('text')
   issue_description: string;
 
@@ -92,6 +95,9 @@ export class Issue {
 
   @Column('json', { nullable: true })
   issue_steps_to_reproduce: string[];
+
+  @Column('json', { nullable: true })
+  issue_files: string[];
 
   @Column('text', { nullable: true })
   issue_environment: string;

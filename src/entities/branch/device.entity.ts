@@ -13,6 +13,9 @@ export class Device {
   device_type: number;
 
   @Column()
+  device_model: string;
+
+  @Column()
   device_type_description: string;
 
   @Column()

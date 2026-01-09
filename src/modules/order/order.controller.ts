@@ -1,24 +1,25 @@
 import { Controller, Post, Body, UseGuards, Get } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { TenantId } from '../../common/decorators/tenant-id.decorator';
-import { TenantRequiredGuard } from '../auth/guards/tenant-required.guard';
+import { CurrentTenant } from '../../common/decorators/current-tenant.decorator';
+import { Tenant } from '../../entities/global/tenant.entity';
+import { TenantSelectionGuard } from '../auth/guards/tenant-selection.guard';
 
 @Controller('orders')
-@UseGuards(TenantRequiredGuard)
+@UseGuards(TenantSelectionGuard)
 export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 
-  @Post()
+  @Post('/create')
   async create(
-    @Body() createOrderDto: CreateOrderDto,
-    @TenantId() tenantId: string,
+    @CurrentTenant() tenant: Tenant,
+    @Body() createOrderDto: CreateOrderDto
   ) {
-    return this.orderService.create(createOrderDto, tenantId);
+    return this.orderService.create(tenant, createOrderDto);
   }
 
   @Get()
-  async getAllOrders(@TenantId() tenantId: string) {
-    return await this.orderService.getAllOrders(tenantId);
+  async getAllOrders(@CurrentTenant() tenant: Tenant) {
+    return await this.orderService.getAllOrders(tenant);
   }
 }

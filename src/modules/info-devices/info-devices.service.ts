@@ -4,20 +4,20 @@ import { DeviceType } from '../../entities/branch/device-type.entity';
 import { DeviceBrand } from '../../entities/branch/device-brand.entity';
 import { DeviceModel } from '../../entities/branch/device-model.entity';
 import { PasswordType } from '../../entities/branch/password-type.entity';
-import { TenantAwareService } from '../../database/tenant-aware.service';
 import { Tenant } from '../../entities/global/tenant.entity';
+import { ConnectionDatabaseService } from 'src/database/connection-database.service';
 
 @Injectable()
 export class InfoDevicesService {
   constructor(
-    private readonly tenantAwareService: TenantAwareService,
-  ) {}
+    private readonly tenantAwareService: ConnectionDatabaseService,
+  ) { }
 
   // Device Types
   async getAllDeviceTypes(tenant: Tenant, page: number = 1, limit: number = 10, filter?: string) {
     const deviceTypeRepository = await this.tenantAwareService.getRepository(DeviceType, tenant);
     const queryBuilder = deviceTypeRepository.createQueryBuilder('deviceType');
-    
+
     if (filter) {
       queryBuilder.where('deviceType.name LIKE :filter OR deviceType.description LIKE :filter', {
         filter: `%${filter}%`
@@ -64,7 +64,7 @@ export class InfoDevicesService {
   async getAllDeviceBrands(tenant: Tenant, page: number = 1, limit: number = 10, filter?: string) {
     const deviceBrandRepository = await this.tenantAwareService.getRepository(DeviceBrand, tenant);
     const queryBuilder = deviceBrandRepository.createQueryBuilder('deviceBrand');
-    
+
     if (filter) {
       queryBuilder.where('deviceBrand.name LIKE :filter OR deviceBrand.description LIKE :filter', {
         filter: `%${filter}%`
@@ -113,7 +113,7 @@ export class InfoDevicesService {
     const queryBuilder = deviceModelRepository.createQueryBuilder('deviceModel')
       .leftJoinAndSelect('deviceModel.deviceType', 'deviceType')
       .leftJoinAndSelect('deviceModel.deviceBrand', 'deviceBrand');
-    
+
     const conditions: string[] = [];
     const parameters: any = {};
 
@@ -152,9 +152,9 @@ export class InfoDevicesService {
 
   async findOneDeviceModel(tenant: Tenant, id: string): Promise<DeviceModel | null> {
     const deviceModelRepository = await this.tenantAwareService.getRepository(DeviceModel, tenant);
-    return deviceModelRepository.findOne({ 
-      where: { id }, 
-      relations: ['deviceType', 'deviceBrand'] 
+    return deviceModelRepository.findOne({
+      where: { id },
+      relations: ['deviceType', 'deviceBrand']
     });
   }
 
@@ -179,7 +179,7 @@ export class InfoDevicesService {
   async getAllPasswordTypes(tenant: Tenant, page: number = 1, limit: number = 10, filter?: string) {
     const passwordTypeRepository = await this.tenantAwareService.getRepository(PasswordType, tenant);
     const queryBuilder = passwordTypeRepository.createQueryBuilder('passwordType');
-    
+
     if (filter) {
       queryBuilder.where('passwordType.name LIKE :filter OR passwordType.description LIKE :filter', {
         filter: `%${filter}%`

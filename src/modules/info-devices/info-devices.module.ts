@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { InfoDevicesController } from './info-devices.controller';
 import { InfoDevicesService } from './info-devices.service';
-import { TenantAwareService } from '../../database/tenant-aware.service';
-import { TenantConnectionService } from '../../database/tenant-connection.service';
 
 @Module({
+  imports: [],
   controllers: [InfoDevicesController],
-  providers: [InfoDevicesService, TenantAwareService, TenantConnectionService],
+  providers: [InfoDevicesService],
   exports: [InfoDevicesService],
 })
-export class InfoDevicesModule {}
+export class InfoDevicesModule { }

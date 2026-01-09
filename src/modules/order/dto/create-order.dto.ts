@@ -11,6 +11,8 @@ export class DeviceDataDto {
   @IsNumber()
   device_brand: number;
 
+  device_model: string;
+
   @IsOptional()
   @IsString()
   serial_number?: string;
@@ -121,6 +123,8 @@ export class CreateOrderDto {
 
   @IsString()
   description: string;
+
+  serviceType:string;
 
   @ValidateNested()
   @Type(() => DeviceDataDto)

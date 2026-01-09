@@ -2,20 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { FailureCategory } from '../../entities/branch/failure-categories.entity';
 import { FailureCode } from '../../entities/branch/failure-codes.entity';
 import { FailureSeverity } from '../../entities/branch/failure-severities.entity';
-import { TenantAwareService } from '../../database/tenant-aware.service';
 import { Tenant } from '../../entities/global/tenant.entity';
+import { ConnectionDatabaseService } from 'src/database/connection-database.service';
 
 @Injectable()
 export class MaintenanceService {
   constructor(
-    private readonly tenantAwareService: TenantAwareService,
-  ) {}
+    private readonly tenantAwareService: ConnectionDatabaseService,
+  ) { }
 
   // Failure Categories
   async getAllFailureCategories(tenant: Tenant, page: number = 1, limit: number = 10, filter?: string) {
     const repository = await this.tenantAwareService.getRepository(FailureCategory, tenant);
     const queryBuilder = repository.createQueryBuilder('failureCategory');
-    
+
     if (filter) {
       queryBuilder.where('failureCategory.name LIKE :filter OR failureCategory.description LIKE :filter', {
         filter: `%${filter}%`
@@ -65,7 +65,7 @@ export class MaintenanceService {
       .leftJoinAndSelect('failureCode.category', 'category')
       .leftJoinAndSelect('failureCode.deviceType', 'deviceType')
       .leftJoinAndSelect('failureCode.severity', 'severity');
-    
+
     const conditions: string[] = [];
     const parameters: any = {};
 
@@ -109,9 +109,9 @@ export class MaintenanceService {
 
   async findOneFailureCode(tenant: Tenant, id: string): Promise<FailureCode | null> {
     const repository = await this.tenantAwareService.getRepository(FailureCode, tenant);
-    return repository.findOne({ 
-      where: { id: parseInt(id) }, 
-      relations: ['category', 'deviceType', 'severity'] 
+    return repository.findOne({
+      where: { id: parseInt(id) },
+      relations: ['category', 'deviceType', 'severity']
     });
   }
 
@@ -136,7 +136,7 @@ export class MaintenanceService {
   async getAllFailureSeverities(tenant: Tenant, page: number = 1, limit: number = 10, filter?: string) {
     const repository = await this.tenantAwareService.getRepository(FailureSeverity, tenant);
     const queryBuilder = repository.createQueryBuilder('failureSeverity');
-    
+
     if (filter) {
       queryBuilder.where('failureSeverity.name LIKE :filter OR failureSeverity.description LIKE :filter', {
         filter: `%${filter}%`
