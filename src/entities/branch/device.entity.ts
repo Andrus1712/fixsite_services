@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Order } from './order.entity';
+import { DeviceModel } from './device-model.entity';
 
 @Entity('devices')
 export class Device {
@@ -9,20 +10,8 @@ export class Device {
   @Column()
   device_name: string;
 
-  @Column()
-  device_type: number;
-
-  @Column()
-  device_model: string;
-
-  @Column()
-  device_type_description: string;
-
-  @Column()
-  device_brand: number;
-
-  @Column()
-  device_brand_type: string;
+  @Column({ nullable: true })
+  device_model: number;
 
   @Column()
   serial_number: string;
@@ -30,13 +19,13 @@ export class Device {
   @Column({ nullable: true })
   imei: string;
 
-  @Column()
+  @Column({ nullable: true })
   model_year: string;
 
-  @Column()
+  @Column({ nullable: true })
   color: string;
 
-  @Column()
+  @Column({ nullable: true })
   storage_capacity: string;
 
   @Column()
@@ -45,4 +34,8 @@ export class Device {
   @ManyToOne(() => Order, order => order.devices)
   @JoinColumn({ name: 'order_id' })
   order: Order;
+
+  @ManyToOne(() => DeviceModel, { nullable: true })
+  @JoinColumn({ name: 'device_model' })
+  deviceModel?: DeviceModel;
 }

@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { User } from '../../entities/global/user.entity';
-import { Role } from '../../entities/global/role.entity';
-import { Tenant } from '../../entities/global/tenant.entity';
+import { User } from 'src/entities/global/user.entity';
+import { Role } from 'src/entities/global/role.entity';
+import { Tenant } from 'src/entities/global/tenant.entity';
 
 @Module({
   imports: [

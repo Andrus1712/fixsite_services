@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request, ForbiddenException, Query } from "@nestjs/common";
 import { PermissionService } from "./permission.service";
 import { TenantService } from "../tenant/tenant.service";
-import { FullTokenGuard } from "../auth/guards/full-token.guard";
+import { FullTokenGuard } from "src/modules/auth/guards/full-token.guard";
 
 @Controller('permissions')
 @UseGuards(FullTokenGuard)

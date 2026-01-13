@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ConnectionDatabaseService } from 'src/database/connection-database.service';
+import { Tenant } from 'src/entities/global/tenant.entity';
 import { Repository, DataSource } from 'typeorm';
-import { Tenant } from '../../entities/global/tenant.entity';
-import { ConnectionDatabaseService } from '../../database/connection-database.service';
 
 interface CreateTenantDto {
   name: string;

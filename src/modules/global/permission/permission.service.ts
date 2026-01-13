@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Components } from 'src/entities/global/components.entity';
+import { Modules } from 'src/entities/global/modules.entity';
+import { Permission } from 'src/entities/global/permissions.entity';
+import { Role } from 'src/entities/global/role.entity';
+import { User } from 'src/entities/global/user.entity';
 import { Repository, In, Like } from 'typeorm';
-import { Permission } from '../../entities/global/permissions.entity';
-import { Modules } from '../../entities/global/modules.entity';
-import { Role } from '../../entities/global/role.entity';
-import { User } from '../../entities/global/user.entity';
-import { Components } from '../../entities/global/components.entity';
 
 @Injectable()
 export class PermissionService {

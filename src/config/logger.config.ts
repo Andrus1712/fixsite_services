@@ -1,6 +1,14 @@
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 
+const getDateString = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export const loggerConfig = WinstonModule.createLogger({
   transports: [
     new winston.transports.Console({
@@ -15,7 +23,7 @@ export const loggerConfig = WinstonModule.createLogger({
       ),
     }),
     new winston.transports.File({
-      filename: 'logs/error.log',
+      filename: `logs/error-${getDateString()}.log`,
       level: 'error',
       format: winston.format.combine(
         winston.format.timestamp(),
@@ -23,7 +31,7 @@ export const loggerConfig = WinstonModule.createLogger({
       ),
     }),
     new winston.transports.File({
-      filename: 'logs/combined.log',
+      filename: `logs/combined-${getDateString()}.log`,
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.json(),

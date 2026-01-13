@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TenantController } from './tenant.controller';
 import { TenantService } from './tenant.service';
-import { Tenant } from '../../entities/global/tenant.entity';
+import { Tenant } from 'src/entities/global/tenant.entity';
 
 @Module({
   imports: [

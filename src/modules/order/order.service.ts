@@ -1,9 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Order, Customer, Device, Issue } from '../../entities/branch';
 import { Tenant } from '../../entities/global/tenant.entity';
 import { OrderResponseDto } from './dto/order-response.dto';
-import { plainToInstance } from 'class-transformer';
 import { ConnectionDatabaseService } from 'src/database/connection-database.service';
 import { EntityManager } from 'typeorm';
 
@@ -46,7 +45,7 @@ export class OrderService {
   private async createOrder(manager: any, createOrderDto: CreateOrderDto, customerId: number) {
 
     const orderCode = await this.generateOrderCode(manager);
-    
+
     const order = manager.create(Order, {
       order_code: orderCode,
       description: createOrderDto.description,
@@ -144,11 +143,10 @@ export class OrderService {
   private formatOrderResponse(order: Order, customer: Customer, device: Device, issues: Issue[], originalDto: CreateOrderDto) {
     return {
       serviceType: originalDto.serviceType,
+      order_code: order.order_code,
       description: order.description,
       device_data: {
         device_name: device.device_name,
-        device_type: device.device_type,
-        device_brand: device.device_brand,
         device_model: device.device_model,
         serial_number: device.serial_number,
         imei: device.imei,
@@ -206,30 +204,61 @@ export class OrderService {
     return severities[severity] || 'medium';
   }
 
-  async getAllOrders(tenant: Tenant, page = 1, limit = 10) {
-    if (!tenant) {
-      throw new Error('Tenant ID is required');
+  async getAllOrders(
+    tenant: Tenant,
+    page = 1,
+    limit = 10,
+    filter?: string,
+  ) {
+    const connection = await this.tenantService.getConnection(tenant);
+    const repo = connection.getRepository(Order);
+
+    const skip = (page - 1) * limit;
+
+    const qb = repo
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.customer', 'customer')
+      .leftJoinAndSelect('order.devices', 'devices')
+      .leftJoinAndSelect('order.issues', 'issues')
+      .leftJoinAndSelect('order.technician', 'technician')
+      .skip(skip)
+      .take(limit)
+      .orderBy('order.createdAt', 'DESC');
+
+    if (filter) {
+      qb.where(
+        '(order.order_code LIKE :filter OR order.description LIKE :filter OR customer.customer_name LIKE :filter)',
+        { filter: `%${filter}%` },
+      );
     }
 
+    const [items, total] = await qb.getManyAndCount();
+
+    return { items, total };
+  }
+
+  async getOrderInfo(tenant: Tenant, order_code: string) {
     const connection = await this.tenantService.getConnection(tenant);
+    const repo = connection.getRepository(Order);
 
-    const orderRepository = connection.getRepository(Order);
+    const order = await repo
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.customer', 'customer')
+      .leftJoinAndSelect('order.devices', 'devices')
+      .leftJoinAndSelect('devices.deviceModel', 'deviceModel')
+      .leftJoinAndSelect('deviceModel.deviceType', 'deviceType')
+      .leftJoinAndSelect('deviceModel.deviceBrand', 'deviceBrand')
+      .leftJoinAndSelect('order.issues', 'issues')
+      .leftJoinAndSelect('order.technician', 'technician')
+      .leftJoinAndSelect('order.notes', 'notes')
+      .where('order.order_code = :order_code', { order_code })
+      .getOne();
+    console.log(JSON.stringify(order, null, 2));
+    
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
 
-    const [orders, total] = await orderRepository.findAndCount({
-      relations: ['customer', 'devices', 'issues', 'technician'],
-    });
-
-
-    const data = plainToInstance(OrderResponseDto, orders, {
-      excludeExtraneousValues: false,
-    });
-
-
-    return {
-      data,
-      total,
-      page: 1,
-      totalPages: 1,
-    };
+    return order;
   }
 }

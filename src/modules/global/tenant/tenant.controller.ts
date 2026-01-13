@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { TenantService } from './tenant.service';
-import { Tenant } from '../../entities/global/tenant.entity';
 import { TenantId } from 'src/common/decorators/tenant-id.decorator';
+import { Tenant } from 'src/entities/global/tenant.entity';
 
 interface CreateTenantDto {
   name: string;

@@ -1,25 +1,24 @@
 import { Module, MiddlewareConsumer, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { globalDatabaseConfig } from './config/database.config';
-import { TenantModule } from './modules/tenant/tenant.module';
-import { UserModule } from './modules/user/user.module';
-import { AuthModule } from './modules/auth/auth.module';
-import { UploadModule } from './modules/upload/upload.module';
-import { OrderModule } from './modules/order/order.module';
-import { InfoDevicesModule } from './modules/info-devices/info-devices.module';
+import { GlobalModule } from './modules/global/global.module';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
-import { ConnectionDatabaseService } from './database/connection-database.service';
 import { SqlContextInterceptor } from './common/interceptors/sql-context.interceptor';
 import { TenantResolverMiddleware } from './common/middleware/tenant-resolver.middleware';
 import { Tenant } from './entities/global/tenant.entity';
-import { MaintenanceModule } from './modules/maintenance/maintenance.module';
 import { ConnectionModule } from './database/conecction.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { InfoDevicesModule } from './modules/info-devices/info-devices.module';
+import { MaintenanceModule } from './modules/maintenance/maintenance.module';
+import { OrderModule } from './modules/order/order.module';
+import { UploadModule } from './modules/upload/upload.module';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 @Module({
   imports: [
@@ -66,13 +65,12 @@ import { ConnectionModule } from './database/conecction.module';
       signOptions: { expiresIn: '24h' },
     }),
     ConnectionModule,
-    TenantModule,
-    UserModule,
+    GlobalModule,
     AuthModule,
-    UploadModule,
-    OrderModule,
     InfoDevicesModule,
-    MaintenanceModule
+    MaintenanceModule,
+    OrderModule,
+    UploadModule
   ],
   controllers: [AppController],
   providers: [
@@ -81,6 +79,10 @@ import { ConnectionModule } from './database/conecction.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: SqlContextInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
     }
   ],
   exports: [],

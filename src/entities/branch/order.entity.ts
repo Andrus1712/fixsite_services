@@ -101,44 +101,4 @@ export class Order {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // @BeforeInsert()
-  // async generateOrderCode() {
-  //   const dataSource = this.constructor['dataSource'] as DataSource;
-  //   const repo = dataSource.getRepository(Order);
-  //   const prefix = '1-';
-
-  //   // 1. Obtener la fecha en formato YYYYMMDD
-  //   const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // Por ejemplo: 20251117
-
-  //   const searchPattern = `${prefix}${datePart}-%`; // Patrón de búsqueda: '1-20251117-%'
-
-  //   // 2. Buscar el último código de orden del día
-  //   const lastOrder = await repo.findOne({
-  //     where: {
-  //       order_code: In([searchPattern]), // Usar 'In' o la cláusula 'like' de la base de datos
-  //     },
-  //     order: {
-  //       order_code: 'DESC', // Ordenar descendente para obtener el más alto
-  //     },
-  //   });
-
-  //   let nextSequence = 1;
-
-  //   if (lastOrder) {
-  //     // 3. Si existe, extraer y calcular la siguiente secuencia
-  //     // Ejemplo: '1-20251117-00005' -> se extrae '00005'
-  //     const lastCode = lastOrder.order_code;
-  //     const sequenceString = lastCode.split('-').pop(); // Obtiene '00005'
-  //     if (sequenceString) {
-  //       const lastSequence = parseInt(sequenceString, 10);
-  //       nextSequence = lastSequence + 1;
-  //     }
-  //   }
-
-  //   // 4. Formatear la secuencia (asegurar que tenga 5 dígitos, por ejemplo '00001')
-  //   const formattedSequence = nextSequence.toString().padStart(5, '0');
-
-  //   // 5. Establecer el order_code
-  //   this.order_code = `${prefix}${datePart}-${formattedSequence}`;
-  // }
 }

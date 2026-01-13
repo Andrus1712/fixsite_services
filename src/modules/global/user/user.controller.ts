@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from '../../entities/global/user.entity';
+import { TenantSelectionGuard } from 'src/modules/auth/guards/tenant-selection.guard';
+import { User } from 'src/entities/global/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { TenantSelectionGuard } from '../auth/guards/tenant-selection.guard';
 
 @Controller('users')
 @UseGuards(TenantSelectionGuard)

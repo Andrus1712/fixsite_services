@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { User } from '../../entities/global/user.entity';
-import { Role } from '../../entities/global/role.entity';
-import { Tenant } from '../../entities/global/tenant.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { User } from 'src/entities/global/user.entity';
+import { Role } from 'src/entities/global/role.entity';
+import { Tenant } from 'src/entities/global/tenant.entity';
 
 @Injectable()
 export class UserService {
@@ -50,40 +50,40 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { roleIds, tenantIds, ...userData } = createUserDto;
-    
+
     const user = this.userRepository.create(userData);
-    
+
     if (roleIds?.length) {
       user.roles = await this.roleRepository.findBy({ id: In(roleIds) });
     }
-    
+
     if (tenantIds?.length) {
       user.tenants = await this.tenantRepository.findBy({ id: In(tenantIds) });
     }
-    
+
     return this.userRepository.save(user);
   }
 
   async update(id: string, updateData: CreateUserDto): Promise<User | null> {
     const { roleIds, tenantIds, ...userData } = updateData;
-    
-    const user = await this.userRepository.findOne({ 
-      where: { id }, 
-      relations: ['roles', 'tenants'] 
+
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['roles', 'tenants']
     });
-    
+
     if (!user) return null;
-    
+
     Object.assign(user, userData);
-    
+
     if (roleIds !== undefined) {
       user.roles = roleIds.length ? await this.roleRepository.findBy({ id: In(roleIds) }) : [];
     }
-    
+
     if (tenantIds !== undefined) {
       user.tenants = tenantIds.length ? await this.tenantRepository.findBy({ id: In(tenantIds) }) : [];
     }
-    
+
     return this.userRepository.save(user);
   }
 
