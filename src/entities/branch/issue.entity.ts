@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Order } from './order.entity';
+import { FailureCode } from './failure-codes.entity';
 
 @Entity('issues')
 export class Issue {
@@ -8,9 +9,6 @@ export class Issue {
 
   @Column()
   issue_name: string;
-
-  @Column()
-  issue_code: string;
 
   @Column('text')
   issue_description: string;
@@ -120,4 +118,8 @@ export class Issue {
   @ManyToOne(() => Order, order => order.issues)
   @JoinColumn({ name: 'order_id' })
   order: Order;
+
+  @ManyToOne(() => FailureCode, failture => failture.id)
+  @JoinColumn({ name: 'issue_code' })
+  issue_code: FailureCode;
 }

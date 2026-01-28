@@ -22,6 +22,13 @@ export class SerializeInterceptor<T> implements NestInterceptor {
         return next.handle().pipe(
             map((data) => {
                 try {
+                    // Si la respuesta tiene una propiedad 'data', transformamos el contenido de esa propiedad
+                    if (data && typeof data === 'object' && 'data' in data) {
+                        return {
+                            ...data,
+                            data: plainToInstance(this.dto, data.data, this.options)
+                        };
+                    }
                     return plainToInstance(this.dto, data, this.options);
                 } catch (error) {
                     this.logger.error(

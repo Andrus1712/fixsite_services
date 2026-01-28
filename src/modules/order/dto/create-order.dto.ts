@@ -11,7 +11,8 @@ export class DeviceDataDto {
   @IsNumber()
   device_brand: number;
 
-  device_model: string;
+  @IsNumber()
+  device_model: number;
 
   @IsOptional()
   @IsString()
@@ -21,7 +22,7 @@ export class DeviceDataDto {
   @IsString()
   imei?: string;
 
-  @IsString()
+  @IsOptional()
   model_year: string;
 
   @IsString()
@@ -44,6 +45,9 @@ export class IssueDto {
   @IsNumber()
   issue_severity: number;
 
+  @IsNumber()
+  issue_code: number;
+
   @IsOptional()
   @IsString()
   issue_additional_info?: string;
@@ -62,10 +66,18 @@ export class IssueDto {
 
   @IsOptional()
   @IsArray()
-  issue_screenshots?: any[];
+  issue_files?: {
+    filename: string,
+    originalName: string,
+    size: string,
+    url: string,
+  }[];
 }
 
 export class CustomerDataDto {
+  @IsNumber()
+  customer_id: number;
+
   @IsString()
   customer_name: string;
 
@@ -79,9 +91,11 @@ export class CustomerDataDto {
   customer_address: string;
 
   @IsString()
+  @IsOptional()
   customer_city: string;
 
   @IsString()
+  @IsOptional()
   customer_country: string;
 
   @IsString()
@@ -106,14 +120,24 @@ export class CostInfoDto {
 }
 
 export class TimelineDto {
-  @IsDateString()
-  estimated_completion: string;
+  @IsOptional()
+  @IsString()
+  estimated_completion?: string;
 
   @IsNumber()
   estimated_hours: number;
 
-  @IsDateString()
-  sla_deadline: string;
+  @IsOptional()
+  @IsString()
+  sla_deadline?: string;
+}
+
+export class NoteDto {
+  @IsString()
+  content: string;
+
+  @IsString()
+  type: string;
 }
 
 export class CreateOrderDto {
@@ -124,7 +148,8 @@ export class CreateOrderDto {
   @IsString()
   description: string;
 
-  serviceType:string;
+  @IsNumber()
+  serviceType: number;
 
   @ValidateNested()
   @Type(() => DeviceDataDto)
@@ -149,4 +174,9 @@ export class CreateOrderDto {
 
   @IsNumber()
   priority: number;
+
+  @IsOptional()
+  @IsArray()
+  @Type(() => NoteDto)
+  notes?: NoteDto[];
 }

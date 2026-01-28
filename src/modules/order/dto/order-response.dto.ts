@@ -103,7 +103,7 @@ export class DeviceResponseDto {
 
     @Expose()
     device_name: string;
-    
+
     @Expose()
     @Transform(({ obj }) => obj.deviceModel?.id)
     device_model: string;
@@ -119,7 +119,7 @@ export class DeviceResponseDto {
     @Expose()
     @Transform(({ obj }) => obj.deviceModel?.deviceType?.name)
     device_type_name: string;
-    
+
     @Expose()
     @Transform(({ obj }) => obj.deviceModel?.deviceBrand?.id)
     device_brand: string;
@@ -150,7 +150,7 @@ export class DeviceResponseDto {
 
 export class IssueResponseDto {
     @Expose()
-    issue_id: number;
+    id: number;
 
     @Expose()
     issue_name: string;
@@ -225,13 +225,8 @@ export class IssueResponseDto {
     issue_additional_info: string;
 
     @Expose()
-    issue_screenshots: string[];
-
-    @Expose()
-    issue_videos: string[];
-
-    @Expose()
-    issue_logs: string[];
+    @Transform(({ obj }) => obj.issue_files.map((file: any) => file.url))
+    issue_files: string[];
 
     @Expose()
     issue_attachments: string[];
@@ -253,6 +248,30 @@ export class IssueResponseDto {
 
     @Expose()
     issue_related_orders: string[];
+
+    @Expose()
+    @Transform(({ obj }) => obj.issue_code?.code)
+    failure_codes_code: string;
+
+    @Expose()
+    @Transform(({ obj }) => obj.issue_code?.name)
+    failure_codes_name: string;
+
+    @Expose()
+    @Transform(({ obj }) => obj.issue_code?.description)
+    failure_codes_description: string;
+
+    @Expose()
+    @Transform(({ obj }) => obj.issue_code?.severity?.name)
+    failure_severities_name: string;
+
+    @Expose()
+    @Transform(({ obj }) => obj.issue_code?.category?.name)
+    failure_categories_name: string;
+
+    @Expose()
+    @Transform(({ obj }) => obj.issue_code?.deviceType?.name)
+    device_types_name: string;
 }
 
 export class TechnicianResponseDto {
@@ -379,7 +398,7 @@ export class OrderResponseDto {
     status_description: string;
     @Expose()
     priority: number;
-    
+
     priority_description: string;
     @Expose()
     customer_id: number;
@@ -400,12 +419,12 @@ export class OrderResponseDto {
     @Expose()
     @Type(() => DeviceResponseDto)
     @IsOptional()
-    devices: DeviceResponseDto;
+    devices: DeviceResponseDto[];
 
-    // @IsOptional()
-    // @Type(() => IssueResponseDto)
-    // @Expose()
-    // issue_info: IssueResponseDto;
+    @IsOptional()
+    @Type(() => IssueResponseDto)
+    @Expose()
+    issues: IssueResponseDto[];
 
     @IsOptional()
     @Type(() => CustomerResponseDto)

@@ -15,3 +15,4 @@ export { FailureCode } from './failure-codes.entity';
 export { FailureSeverity } from './failure-severities.entity';
 export { PasswordType } from './password-type.entity';
 export { RepairAction } from './repair-action.entity';
+export { LogEvents } from './log-events.entity';

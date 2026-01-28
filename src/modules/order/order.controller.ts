@@ -9,34 +9,35 @@ import { OrderResponseDto } from './dto/order-response.dto';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { SerializeInterceptor } from 'src/common/interceptors/serialize.interceptor';
 
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { LogStatus, LogType } from 'src/entities/branch/log-events.entity';
+import { LogEventService } from '../log-events/logs-events.service';
+
 @Controller('orders')
 @UseGuards(TenantSelectionGuard)
 export class OrderController {
-  constructor(private readonly orderService: OrderService) { }
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly logEventService: LogEventService
+  ) { }
 
+  @UseInterceptors(new SerializeInterceptor(OrderResponseDto, { excludeExtraneousValues: true }))
   @Post('/create')
   async create(
     @CurrentTenant() tenant: Tenant,
+    @CurrentUser() user: any,
     @Body() createOrderDto: CreateOrderDto
   ) {
-    try {
-      const data = await this.orderService.create(tenant, createOrderDto);
-      return {
-        success: true,
-        status: HttpStatus.CREATED,
-        message: "Registro creado exitosamente",
-        data,
-        errors: null
-      };
-    } catch (error) {
-      return {
-        success: false,
-        status: HttpStatus.BAD_REQUEST,
-        message: "Error al crear el registro",
-        data: null,
-        errors: error.message
-      };
-    }
+
+    const data = await this.orderService.create(tenant, createOrderDto, user.username);
+
+    return {
+      success: true,
+      status: HttpStatus.CREATED,
+      message: "Registro creado exitosamente",
+      data,
+      errors: null
+    };
   }
 
   @Get('/all')
@@ -71,6 +72,13 @@ export class OrderController {
     @CurrentTenant() tenant: Tenant,
     @Param('order_code') orderCode: string,
   ) {
-    return this.orderService.getOrderInfo(tenant, orderCode);
+    const data = await this.orderService.getOrderInfo(tenant, orderCode);
+    return {
+      success: true,
+      status: HttpStatus.OK,
+      message: "Orden consultada correctamente",
+      data,
+      errors: null
+    };
   }
 }

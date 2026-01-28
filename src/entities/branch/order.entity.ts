@@ -6,6 +6,7 @@ import { Issue } from './issue.entity';
 import { Part } from './part.entity';
 import { StatusHistory } from './status-history.entity';
 import { Note } from './note.entity';
+import { LogEvents } from './log-events.entity';
 
 @Entity('orders')
 export class Order {
@@ -94,6 +95,9 @@ export class Order {
 
   @OneToMany(() => Note, note => note.order)
   notes: Note[];
+
+  @OneToMany(() => LogEvents, log => log.order)
+  logs: LogEvents[];
 
   @CreateDateColumn()
   createdAt: Date;
