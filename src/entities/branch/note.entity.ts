@@ -18,8 +18,8 @@ export class Note {
   @Column()
   type: string;
 
-  @Column()
-  order_id: number;
+  // @Column()
+  // order_id: number;
 
   @ManyToOne(() => Order, order => order.notes)
   @JoinColumn({ name: 'order_id' })

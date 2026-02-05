@@ -6,18 +6,18 @@ import { SQL_CONTEXT_KEY } from '../decorators/sql-context.decorator';
 
 @Injectable()
 export class SqlContextInterceptor implements NestInterceptor {
-  constructor(private reflector: Reflector) {}
+  constructor(private reflector: Reflector) { }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const sqlContext = this.reflector.get<string>(SQL_CONTEXT_KEY, context.getHandler());
-    
-    if (sqlContext) {
-      SqlLogger.setContext(sqlContext);
-    } else {
-      const controllerName = context.getClass().name;
-      const methodName = context.getHandler().name;
-      SqlLogger.setContext(`${controllerName}.${methodName}`);
-    }
+    const sqlContext = this.reflector.get<string>(
+      SQL_CONTEXT_KEY,
+      context.getHandler(),
+    );
+
+    const controllerName = context.getClass()?.name ?? 'UnknownController';
+    const methodName = context.getHandler()?.name ?? 'unknownMethod';
+
+    SqlLogger.setContext(sqlContext ?? `${controllerName}.${methodName}`);
 
     return next.handle();
   }

@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './jwt/jwt-auth.guard';
 import { FullTokenGuard } from './guards/full-token.guard';
-import { TenantRequiredGuard } from './guards/tenant-required.guard';
+import { TenantSelectionGuard } from './guards/tenant-selection.guard';
 import type { Response } from 'express';
 import { cookieConfig } from '../../config/cookie.config';
 

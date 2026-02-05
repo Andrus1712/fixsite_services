@@ -1,15 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
-import { TenantConnectionService } from '../../database/tenant-connection.service';
-import { Tenant } from '../../entities/global/tenant.entity';
-
+import { LogEventService } from '../log-events/logs-events.service';
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Tenant], 'globalConnection'),
-  ],
+  imports: [],
   controllers: [OrderController],
-  providers: [OrderService, TenantConnectionService],
+  providers: [OrderService, LogEventService],
+  exports: [OrderService],
 })
 export class OrderModule { }

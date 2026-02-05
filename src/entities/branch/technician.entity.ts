@@ -7,19 +7,19 @@ export class Technician {
   id: number;
 
   @Column()
-  assigned_technician_name: string;
+  name: string;
 
   @Column()
-  assigned_technician_email: string;
+  email: string;
 
   @Column()
-  assigned_technician_phone: string;
+  phone: string;
 
   @Column()
-  assigned_technician_specialty: string;
+  specialty: string;
 
   @Column()
-  technician_level: string;
+  level: string;
 
   @Column({ nullable: true })
   certification: string;
