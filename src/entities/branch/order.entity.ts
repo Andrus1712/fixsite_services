@@ -34,9 +34,6 @@ export class Order {
   @Column()
   customer_id: number;
 
-  @Column({ nullable: true })
-  assigned_technician_id: number;
-
   @Column('decimal', { precision: 10, scale: 2, nullable: true })
   estimated_cost: number;
 
@@ -77,7 +74,10 @@ export class Order {
   @JoinColumn({ name: 'customer_id' })
   customer: Customer;
 
-  @ManyToOne(() => Technician)
+  @Column({ nullable: true })
+  assigned_technician_id: number;
+
+  @ManyToOne(() => Technician, technician => technician.orders, { nullable: true })
   @JoinColumn({ name: 'assigned_technician_id' })
   technician: Technician;
 

@@ -331,6 +331,7 @@ export class OrderService {
       .leftJoinAndSelect('failure_code.deviceType', 'issue_device_type')
       .leftJoinAndSelect('order.technician', 'technician')
       .leftJoinAndSelect('order.notes', 'notes')
+      .leftJoinAndSelect('order.technician', 'technicians')
       .where('order.order_code = :order_code', { order_code })
       .getOne();
 
@@ -338,5 +339,24 @@ export class OrderService {
       throw new NotFoundException('Order not found');
     }
     return order;
+  }
+
+  async assignOrder(tenant: Tenant, body: any, author: string) {
+    const connection = await this.tenantService.getConnection(tenant);
+    return await connection.transaction(async (manager) => {
+      const order = await manager.findOne(Order, {
+        where: { order_code: body.orderCode }
+      });
+
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      order.assigned_technician_id = body.technicianId;
+
+      await manager.save(Order, order);
+
+      return order;
+    });
   }
 }

@@ -12,6 +12,7 @@ import { SerializeInterceptor } from 'src/common/interceptors/serialize.intercep
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { LogStatus, LogType } from 'src/entities/branch/log-events.entity';
 import { LogEventService } from '../log-events/logs-events.service';
+import { AssignTechnicianOrderDto } from '../technician/dto/assign-technician-order.dto';
 
 @Controller('orders')
 @UseGuards(TenantSelectionGuard)
@@ -77,6 +78,22 @@ export class OrderController {
       success: true,
       status: HttpStatus.OK,
       message: "Orden consultada correctamente",
+      data,
+      errors: null
+    };
+  }
+
+  @Post('/assign')
+  async asignTechnicianToOrder(
+    @CurrentTenant() tenant: Tenant,
+    @CurrentUser() user: any,
+    @Body() body: AssignTechnicianOrderDto
+  ) {
+    const data = await this.orderService.assignOrder(tenant, body, user.username);
+    return {
+      success: true,
+      status: HttpStatus.OK,
+      message: "Orden asignada correctamente",
       data,
       errors: null
     };

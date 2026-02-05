@@ -276,22 +276,22 @@ export class IssueResponseDto {
 
 export class TechnicianResponseDto {
     @Expose()
-    assigned_technician_id: number;
+    id: number;
 
     @Expose()
-    assigned_technician_name: string;
+    name: string;
 
     @Expose()
-    assigned_technician_email: string;
+    email: string;
 
     @Expose()
-    assigned_technician_phone: string;
+    phone: string;
 
     @Expose()
-    assigned_technician_specialty: string;
+    specialty: string;
 
     @Expose()
-    technician_level: string;
+    level: string;
 
     @Expose()
     certification: string;
@@ -431,9 +431,10 @@ export class OrderResponseDto {
     @Expose()
     customer: CustomerResponseDto;
 
-    // @IsOptional()
-    // @Type(() => TechnicianResponseDto)
-    // technician_data: TechnicianResponseDto;
+    @IsOptional()
+    @Type(() => TechnicianResponseDto)
+    @Expose()
+    technician: TechnicianResponseDto;
 
     // @IsOptional()
     // @Type(() => CostInfoDto)
