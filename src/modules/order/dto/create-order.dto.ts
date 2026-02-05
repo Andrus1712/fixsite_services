@@ -116,6 +116,7 @@ export class TimelineDto {
 
 export class CreateOrderDto {
   @IsString()
+  @IsOptional()
   order_code: string;
 
   @IsString()

@@ -18,6 +18,10 @@ export class OrderService {
   ) { }
 
   async create(createOrderDto: CreateOrderDto, tenantId: string) {
+    if (!tenantId) {
+      throw new Error('Tenant ID is required');
+    }
+    
     const tenant = await this.tenantRepository.findOne({ where: { id: tenantId } });
     if (!tenant) {
       throw new Error(`Tenant with ID ${tenantId} not found`);
@@ -37,8 +41,7 @@ export class OrderService {
       }
 
       // 2. Crear orden
-      const order = manager.create(Order, {
-        order_code: createOrderDto.order_code,
+      const order = manager.create(Order, { 
         description: createOrderDto.description,
         status: 1,
         status_description: 'pending',
@@ -115,7 +118,13 @@ export class OrderService {
   }
 
   async getAllOrders(tenantId: string, page = 1, limit = 10) {
+    if (!tenantId) {
+      throw new Error('Tenant ID is required');
+    }
+    
     const tenant = await this.tenantRepository.findOne({ where: { id: tenantId } });
+    console.log({tenant});
+    
     if (!tenant) {
       throw new Error(`Tenant with ID ${tenantId} not found`);
     }

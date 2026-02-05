@@ -2,10 +2,10 @@ import { Controller, Post, Body, UseGuards, Get } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { TenantId } from '../../common/decorators/tenant-id.decorator';
-import { TenantSelectionGuard } from '../auth/guards/tenant-selection.guard';
+import { TenantRequiredGuard } from '../auth/guards/tenant-required.guard';
 
 @Controller('orders')
-@UseGuards(TenantSelectionGuard)
+@UseGuards(TenantRequiredGuard)
 export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 

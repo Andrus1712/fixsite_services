@@ -69,6 +69,29 @@ export class TenantService {
 
   }
 
+  async getAllTenants(page: number, limit: number, filter?: string) {
+    const queryBuilder = this.tenantRepository.createQueryBuilder('tenant');
+    
+    if (filter) {
+      queryBuilder.where('tenant.name ILIKE :filter OR tenant.subdomain ILIKE :filter', {
+        filter: `%${filter}%`
+      });
+    }
+    
+    const [tenants, total] = await queryBuilder
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+    
+    return {
+      data: tenants,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    };
+  }
+
   async getTenantById(id: string | null) {
     if (!id) {
       return null;

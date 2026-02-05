@@ -38,9 +38,9 @@ export class UserController {
   @Put(':id')
   update(
     @Param('id') id: string,
-    @Body() userData: Partial<User>,
+    @Body() updateUserDto: CreateUserDto,
   ): Promise<User | null> {
-    return this.userService.update(id, userData);
+    return this.userService.update(id, updateUserDto);
   }
 
   @Delete(':id')
