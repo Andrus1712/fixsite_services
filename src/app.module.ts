@@ -22,6 +22,7 @@ import { CustomerModule } from './modules/customer/customer.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LogEventsModule } from './modules/log-events/log-events.module';
 import { TechnicianModule } from './modules/technician/technician.module';
+import { InventoryModule } from './modules/inventory/Inventory.module';
 
 @Module({
   imports: [
@@ -76,7 +77,8 @@ import { TechnicianModule } from './modules/technician/technician.module';
     UploadModule,
     CustomerModule,
     LogEventsModule,
-    TechnicianModule
+    TechnicianModule,
+    InventoryModule
   ],
   controllers: [AppController],
   providers: [
@@ -112,6 +114,17 @@ export class AppModule implements NestModule {
         'customers',
         'log-events/*path',
         'technicians/*path',
+        'article-brands/*path',
+        'article-categories/*path',
+        'articles/*path',
+        'inventory/*path',
+        'providers/*path',
+        'stores/*path',
+        'inventory-adjustments/*path',
+        'material-receipts/*path',
+        'material-issues/*path',
+        'purchase-orders/*path',
+        'stock-transfers/*path',
       );
   }
 }

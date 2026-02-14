@@ -23,7 +23,7 @@ export class ConnectionDatabaseService implements OnModuleInit, OnModuleDestroy 
 
       const connectionPromises = tenants.map(async (tenant) => {
         try {
-          await this.getConnection(tenant);
+          await this.getTenantConnection(tenant);
           console.log(`[Database] Connection established for tenant: ${tenant.name}`);
         } catch (error) {
           console.error(`[Database] Error connecting tenant ${tenant.name}:`, error.message);
@@ -38,6 +38,34 @@ export class ConnectionDatabaseService implements OnModuleInit, OnModuleDestroy 
   }
 
   async getConnection(tenant: Tenant): Promise<DataSource> {
+    if (this.connections.has(tenant.id)) {
+      const connection = this.connections.get(tenant.id);
+      if (connection?.isInitialized) {
+        return connection;
+      }
+    }
+
+    const connectionOptions: DataSourceOptions = {
+      type: 'postgres',
+      host: tenant.dbHost,
+      port: tenant.dbPort,
+      username: tenant.dbUsername,
+      password: tenant.dbPassword ? String(tenant.dbPassword) : '',
+      database: tenant.databaseName,
+      entities: Object.values(branchEntities),
+      synchronize: true,
+      logging: false,
+      name: tenant.id,
+    };
+
+    const connection = new DataSource(connectionOptions);
+    await connection.initialize();
+
+    this.connections.set(tenant.id, connection);
+    return connection;
+  }
+
+  async getTenantConnection(tenant: Tenant): Promise<DataSource> {
     if (this.connections.has(tenant.id)) {
       const connection = this.connections.get(tenant.id);
       if (connection?.isInitialized) {
