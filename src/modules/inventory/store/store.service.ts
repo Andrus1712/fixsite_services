@@ -172,6 +172,7 @@ export class StoreService {
                 store.name as store_to_name,
                 mr."createdBy" as created_by,
                 mr."createdAt" as created_at,
+                mr."approvedBy" as approved_by,
                 COUNT(items.id) as count_items,
                 NULL as reason
             FROM material_receipts mr
@@ -193,6 +194,7 @@ export class StoreService {
                 NULL as store_to_name,
                 mi."createdBy" as created_by,
                 mi."createdAt" as created_at,
+                mi."approvedBy" as approved_by,
                 COUNT(items.id) as count_items,
                 NULL as reason
             FROM material_issues mi
@@ -214,6 +216,7 @@ export class StoreService {
                 "toStore".name as store_to_name,
                 st."createdBy" as created_by,
                 st."createdAt" as created_at,
+                st."approvedBy" as approved_by,
                 COUNT(items.id) as count_items,
                 NULL as reason
             FROM stock_transfers st
@@ -236,6 +239,7 @@ export class StoreService {
                 store.name as store_to_name,
                 ia."createdBy" as created_by,
                 ia."createdAt" as created_at,
+                ia."approvedBy" as approved_by,
                 COUNT(items.id) as count_items,
                 ia.reason as reason
             FROM inventory_adjustments ia
