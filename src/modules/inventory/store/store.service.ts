@@ -90,6 +90,8 @@ export class StoreService {
             queryBuilder.andWhere('stores.id = :id', { id });
         }
 
+        queryBuilder.andWhere('inventory.stock > 0');
+
         queryBuilder.select([
             'inventory.id',
             'inventory.stock',
