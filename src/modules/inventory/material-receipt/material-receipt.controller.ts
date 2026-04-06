@@ -120,4 +120,12 @@ export class MaterialReceiptController {
 
         return ResponseUtil.success(data, 'Recepción de material cancelada correctamente');
     }
+
+    @Get('/testSocket/emit')
+    async testSocket(
+        @CurrentTenant() tenant: Tenant
+    ) {
+        await this.service.testSocket(tenant);
+        return { message: 'Socket test successful' };
+    }
 }

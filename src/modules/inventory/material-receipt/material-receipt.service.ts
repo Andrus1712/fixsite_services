@@ -7,13 +7,14 @@ import { InventoryService } from "../inventory-core/inventory.service";
 import { CreateMaterialReceiptDto } from "./dto/create-material-receipt.dto";
 import { UpdateMaterialReceiptDto } from "./dto/update-material-receipt.dto";
 import { MovementType } from "src/entities/branch/movement.entity";
-import { DataSource } from "typeorm";
+import { RealtimeService } from "src/modules/realtime/realtime.service";
 
 @Injectable()
 export class MaterialReceiptService {
     constructor(
         private readonly tenantService: ConnectionDatabaseService,
-        private readonly inventoryService: InventoryService
+        private readonly inventoryService: InventoryService,
+        private readonly realtimeService: RealtimeService
     ) { }
 
     async create(tenant: Tenant, dto: CreateMaterialReceiptDto, userId: string) {
@@ -189,6 +190,16 @@ export class MaterialReceiptService {
             }
 
             await queryRunner.commitTransaction();
+            // Por ultimo, emitir actualización de stats y notificación
+            await this.realtimeService.emitStats(tenant.id);
+            // this.realtimeService.sendNotification(tenant.id, {
+            //     id: uuid(),
+            //     userId: userId,        // o undefined para broadcast al tenant
+            //     type: 'RECEIPT_APPROVED',
+            //     title: 'Recepción aprobada',
+            //     body: `Recepción #${id} fue aprobada`,
+            //     createdAt: new Date().toISOString(),
+            // });
             return this.findOne(tenant, id);
         } catch (error) {
             await queryRunner.rollbackTransaction();
@@ -229,5 +240,9 @@ export class MaterialReceiptService {
         await receiptRepo.save(receipt);
 
         return this.findOne(tenant, id);
+    }
+
+    async testSocket(tenant: Tenant) {
+        await this.realtimeService.emitStatsTest(tenant.id, { message: 'Socket test successful' });
     }
 }

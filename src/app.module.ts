@@ -23,6 +23,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LogEventsModule } from './modules/log-events/log-events.module';
 import { TechnicianModule } from './modules/technician/technician.module';
 import { InventoryModule } from './modules/inventory/Inventory.module';
+import { RealtimeModule } from './modules/realtime/realtime.module';
 
 @Module({
   imports: [
@@ -78,7 +79,8 @@ import { InventoryModule } from './modules/inventory/Inventory.module';
     CustomerModule,
     LogEventsModule,
     TechnicianModule,
-    InventoryModule
+    InventoryModule,
+    RealtimeModule
   ],
   controllers: [AppController],
   providers: [
