@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, JoinColumn, JoinTable, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Order } from './order.entity';
 import { Service } from './service.entity';
+import { OrderIssue } from './issue.entity';
 
 @Entity('orders_service')
 export class OrderService {
@@ -13,6 +14,14 @@ export class OrderService {
   @Column()
   service_id: number;
 
+  @ManyToMany(() => OrderIssue, { nullable: true, eager: false })
+  @JoinTable({
+    name: 'order_service_issues',
+    joinColumn: { name: 'order_service_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'order_issue_id', referencedColumnName: 'id' },
+  })
+  issues: OrderIssue[];
+
   @Column('decimal', { precision: 10, scale: 2, nullable: true })
   precio: number;
 
@@ -21,9 +30,6 @@ export class OrderService {
 
   @Column('text', { nullable: true })
   notas: string;
-
-  @Column({ default: true })
-  activo: boolean;
 
   @ManyToOne(() => Order, { nullable: false })
   @JoinColumn({ name: 'order_id' })

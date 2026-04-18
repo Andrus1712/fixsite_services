@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsBoolean, IsNumber, IsString } from 'class-validator';
+import { IsInt, IsOptional, IsBoolean, IsNumber, IsString, IsArray } from 'class-validator';
 
 export class CreateOrderServiceDto {
   @IsInt()
@@ -6,6 +6,11 @@ export class CreateOrderServiceDto {
 
   @IsInt()
   service_id: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  issues_ids?: number[];
 
   @IsOptional()
   @IsNumber()

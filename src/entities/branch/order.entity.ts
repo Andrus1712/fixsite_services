@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColum
 import { Customer } from './customer.entity';
 import { Technician } from './technician.entity';
 import { Device } from './device.entity';
-import { Issue } from './issue.entity';
+import { OrderIssue } from './issue.entity';
 import { Part } from './part.entity';
 import { StatusHistory } from './status-history.entity';
 import { Note } from './note.entity';
@@ -93,8 +93,8 @@ export class Order {
   @OneToMany(() => Device, device => device.order)
   devices: Device[];
 
-  @OneToMany(() => Issue, issue => issue.order)
-  issues: Issue[];
+  @OneToMany(() => OrderIssue, issue => issue.order)
+  issues: OrderIssue[];
 
   @OneToMany(() => Part, part => part.order)
   parts: Part[];

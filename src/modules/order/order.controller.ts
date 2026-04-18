@@ -1,14 +1,14 @@
 import { Controller, Post, Body, UseGuards, Get, HttpStatus, Param, Query, UseInterceptors } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateOrderIssueDto } from './dto/create-order-issue.dto';
 import { CurrentTenant } from '../../common/decorators/current-tenant.decorator';
 import { Tenant } from '../../entities/global/tenant.entity';
 import { TenantSelectionGuard } from '../auth/guards/tenant-selection.guard';
 import { plainToInstance } from 'class-transformer';
-import { OrderResponseDto } from './dto/order-response.dto';
+import { OrderResponseDto, IssueResponseDto } from './dto/order-response.dto';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { SerializeInterceptor } from 'src/common/interceptors/serialize.interceptor';
-
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { LogStatus, LogType } from 'src/entities/branch/log-events.entity';
 import { LogEventService } from '../log-events/logs-events.service';
@@ -80,6 +80,22 @@ export class OrderController {
       message: "Orden consultada correctamente",
       data,
       errors: null
+    };
+  }
+
+  @UseInterceptors(new SerializeInterceptor(IssueResponseDto, { excludeExtraneousValues: true }))
+  @Post('/issues/create')
+  async createIssue(
+    @CurrentTenant() tenant: Tenant,
+    @Body() dto: CreateOrderIssueDto,
+  ) {
+    const data = await this.orderService.createIssue(tenant, dto);
+    return {
+      success: true,
+      status: HttpStatus.CREATED,
+      message: 'Issue creado exitosamente',
+      data,
+      errors: null,
     };
   }
 

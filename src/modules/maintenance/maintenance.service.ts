@@ -75,17 +75,17 @@ export class MaintenanceService {
     }
 
     if (categoryId) {
-      conditions.push('failureCode.category.id = :categoryId');
+      conditions.push('category.id = :categoryId');
       parameters.categoryId = parseInt(categoryId);
     }
 
     if (deviceTypeId) {
-      conditions.push('failureCode.deviceType.id = :deviceTypeId');
+      conditions.push('deviceType.id = :deviceTypeId');
       parameters.deviceTypeId = deviceTypeId;
     }
 
     if (severityId) {
-      conditions.push('failureCode.severity.id = :severityId');
+      conditions.push('severity.id = :severityId');
       parameters.severityId = parseInt(severityId);
     }
 

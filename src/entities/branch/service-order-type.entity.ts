@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Service } from './service.entity';
 import { OrderType } from './order-type.entity';
-import { Issue } from './issue.entity';
+import { FailureCode } from './failure-codes.entity';
 
 @Entity('service_order_types')
 export class ServiceOrderType {
@@ -16,9 +16,9 @@ export class ServiceOrderType {
   @JoinColumn({ name: 'order_type_id' })
   orderType: OrderType;
 
-  @ManyToOne(() => Issue, { nullable: true })
+  @ManyToOne(() => FailureCode, { nullable: true })
   @JoinColumn({ name: 'issue_id' })
-  issue: Issue;
+  issue: FailureCode;
 
   @Column('decimal', { precision: 10, scale: 2 })
   precio: number;

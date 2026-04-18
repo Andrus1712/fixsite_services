@@ -260,6 +260,10 @@ export class IssueResponseDto {
     @Expose()
     @Transform(({ obj }) => obj.issue_code?.description)
     failure_codes_description: string;
+    
+    @Expose()
+    @Transform(({ obj }) => obj.issue_code?.id)
+    failure_codes_id: number;
 
     @Expose()
     @Transform(({ obj }) => obj.issue_code?.severity?.name)
@@ -272,6 +276,12 @@ export class IssueResponseDto {
     @Expose()
     @Transform(({ obj }) => obj.issue_code?.deviceType?.name)
     device_types_name: string;
+
+    @Expose()
+    status: string;
+
+    @Expose()
+    is_resolved: boolean;
 }
 
 export class TechnicianResponseDto {

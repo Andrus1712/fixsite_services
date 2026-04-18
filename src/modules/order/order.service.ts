@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { Order, Customer, Device, Issue, DeviceModel, Note, LogEvents } from '../../entities/branch';
+import { CreateOrderIssueDto } from './dto/create-order-issue.dto';
+import { Order, Customer, Device, OrderIssue, DeviceModel, Note, LogEvents } from '../../entities/branch';
 import { Tenant } from '../../entities/global/tenant.entity';
 import { ConnectionDatabaseService } from 'src/database/connection-database.service';
 import { EntityManager } from 'typeorm';
@@ -124,7 +125,7 @@ export class OrderService {
   }
 
   private async createIssues(manager: any, issuesData: any[], orderId: number) {
-    const issues: Issue[] = [];
+    const issues: OrderIssue[] = [];
 
     for (const issueData of issuesData) {
       const issueDataWithDefaults = {
@@ -132,8 +133,8 @@ export class OrderService {
         order_id: orderId
       };
 
-      const issue = manager.create(Issue, issueDataWithDefaults);
-      const savedIssue = await manager.save(Issue, issue);
+      const issue = manager.create(OrderIssue, issueDataWithDefaults);
+      const savedIssue = await manager.save(OrderIssue, issue);
       issues.push(savedIssue);
     }
 
@@ -164,8 +165,8 @@ export class OrderService {
     return notes;
   }
 
-  private async loadIssuesWithRelations(manager: any, issues: Issue[]) {
-    return await manager.getRepository(Issue).find({
+  private async loadIssuesWithRelations(manager: any, issues: OrderIssue[]) {
+    return await manager.getRepository(OrderIssue).find({
       where: issues.map(i => ({ id: i.id })),
       relations: [
         'issue_code',
@@ -187,7 +188,7 @@ export class OrderService {
     manager: any,
     order: Order,
     device: Device,
-    issues: Issue[],
+    issues: OrderIssue[],
     notes: Note[],
     author: string
   ) {
@@ -209,7 +210,7 @@ export class OrderService {
   private buildLogEventMetadata(
     order: Order,
     device: Device,
-    issues: Issue[],
+    issues: OrderIssue[],
     notes: Note[],
     author: string
   ): Record<string, any> {
@@ -224,7 +225,7 @@ export class OrderService {
     order: Order,
     customer: Customer,
     deviceWithRelations: Device,
-    issuesWithRelations: Issue[],
+    issuesWithRelations: OrderIssue[],
     notes: Note[]
   ) {
     return {
@@ -342,6 +343,36 @@ export class OrderService {
       throw new NotFoundException('Order not found');
     }
     return order;
+  }
+
+  async createIssue(tenant: Tenant, dto: CreateOrderIssueDto) {
+    const connection = await this.tenantService.getConnection(tenant);
+
+    return await connection.transaction(async (manager) => {
+      const order = await manager.findOne(Order, { where: { id: dto.order_id } });
+      if (!order) {
+        throw new NotFoundException(`Order with ID ${dto.order_id} not found`);
+      }
+
+      const { order_id, issue_code, ...rest } = dto;
+      const issueData = this.buildIssueData({ ...rest, issue_code });
+
+      // Separar la relación del resto para evitar que TypeORM intente hacer upsert
+      const { issue_code: issueCodeRelation, ...issueFields } = issueData;
+
+      const issue = manager.create(OrderIssue, {
+        ...issueFields,
+        order_id,
+        issue_code: { id: issue_code } as any,
+      });
+
+      const saved = await manager.save(OrderIssue, issue);
+
+      return manager.getRepository(OrderIssue).findOne({
+        where: { id: saved.id },
+        relations: ['issue_code', 'issue_code.severity', 'issue_code.category', 'issue_code.deviceType'],
+      });
+    });
   }
 
   async assignOrder(tenant: Tenant, body: any, author: string) {

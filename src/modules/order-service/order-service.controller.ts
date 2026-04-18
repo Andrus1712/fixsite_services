@@ -36,6 +36,15 @@ export class OrderServiceController {
     return this.orderServiceService.findOne(tenant, id);
   }
 
+  @Get('order/:order_id')
+  async findOrderServiceByOrderId(
+    @CurrentTenant() tenant: Tenant,
+    @Param('order_id', ParseIntPipe) id: number
+  ) {
+    const raw = await this.orderServiceService.findOrderServiceByOrderId(tenant, id);
+    return { data: raw, total: raw.length };
+  }
+
   @Put(':id')
   update(@CurrentTenant() tenant: Tenant, @Param('id', ParseIntPipe) id: number, @Body() dto: UpdateOrderServiceDto) {
     return this.orderServiceService.update(tenant, id, dto);

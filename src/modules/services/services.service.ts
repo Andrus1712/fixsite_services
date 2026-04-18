@@ -4,6 +4,7 @@ import { Tenant } from 'src/entities/global/tenant.entity';
 import { Service } from '../../entities/branch/service.entity';
 import { OrderType } from '../../entities/branch/order-type.entity';
 import { ServiceOrderType } from '../../entities/branch/service-order-type.entity';
+import { OrderService } from '../../entities/branch/order-service.entity';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { CreateOrderTypeDto } from './dto/create-order-type.dto';
@@ -148,10 +149,36 @@ export class ServicesService {
 
   // ── Available Services by OrderType + Issues ──────────────────────────────
 
-  async findAvailableServices(tenant: Tenant, orderTypeId: number, issueIds: number[]) {
-    const repo = await this.tenantAwareService.getRepository(ServiceOrderType, tenant);
+  async findAvailableServices(
+    tenant: Tenant,
+    orderTypeId: number,
+    orderServiceIds: number[], // IDs de orders_service (no de orders_issues)
+    orderId?: number,
+  ) {
+    const connection = await this.tenantAwareService.getConnection(tenant);
+    const sotRepo = connection.getRepository(ServiceOrderType);
+    const orderServiceRepo = connection.getRepository(OrderService);
 
-    const qb = repo.createQueryBuilder('sot')
+    // Resolver los failure_code IDs a partir de los IDs de orders_service
+    // orders_service → order_service_issues (join table) → orders_issues.issue_code (FK a failure_codes)
+    let failureCodeIds: number[] = [];
+
+    if (orderServiceIds?.length) {
+      // Obtener los failure_code IDs (issue_code es la FK en orders_issues hacia failure_codes)
+      const rows: { issue_code: number }[] = await orderServiceRepo
+        .createQueryBuilder('os')
+        .innerJoin('order_service_issues', 'osi', 'osi.order_service_id = os.id')
+        .innerJoin('orders_issues', 'oi', 'oi.id = osi.order_issue_id')
+        .select('oi.issue_code', 'issue_code')
+        .where('os.id NOT IN (:...orderServiceIds)', { orderServiceIds })
+        .andWhere('oi.issue_code IS NOT NULL')
+        .distinct(true)
+        .getRawMany();
+
+      failureCodeIds = rows.map(r => r.issue_code).filter(id => id != null);
+    }
+
+    const qb = sotRepo.createQueryBuilder('sot')
       .leftJoinAndSelect('sot.service', 'service')
       .leftJoinAndSelect('sot.orderType', 'orderType')
       .leftJoinAndSelect('sot.issue', 'issue')
@@ -159,10 +186,20 @@ export class ServicesService {
       .andWhere('sot.activo = true')
       .andWhere('service.activo = true');
 
-    if (issueIds?.length) {
-      qb.andWhere('sot.issue_id IN (:...issueIds)', { issueIds });
+    if (failureCodeIds.length) {
+      qb.andWhere('sot.issue_id IN (:...failureCodeIds)', { failureCodeIds });
     } else {
       qb.andWhere('sot.issue_id IS NULL');
+    }
+
+    if (orderId) {
+      const subQuery = orderServiceRepo
+        .createQueryBuilder('os')
+        .select('os.service_id')
+        .where('os.order_id = :orderId', { orderId });
+
+      qb.andWhere(`sot.service_id NOT IN (${subQuery.getQuery()})`)
+        .setParameter('orderId', orderId);
     }
 
     return qb.orderBy('service.descripcion', 'ASC').getMany();

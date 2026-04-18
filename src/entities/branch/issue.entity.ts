@@ -1,9 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Order } from './order.entity';
 import { FailureCode } from './failure-codes.entity';
 
+
+export enum OrderIssuesStatus {
+  PENDING = 'PENDING',
+  RESOLVED = 'RESOLVED',
+  REJECTED = 'REJECTED',
+}
+
+
 @Entity('orders_issues')
-export class Issue {
+export class OrderIssue {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -122,4 +130,16 @@ export class Issue {
   @ManyToOne(() => FailureCode, failture => failture.id)
   @JoinColumn({ name: 'issue_code' })
   issue_code: FailureCode;
+
+  @Column({ type: 'bool', default: false })
+  is_resolved: boolean;
+
+  @Column({ type: 'enum', enum: OrderIssuesStatus, default: OrderIssuesStatus.PENDING })
+  status: OrderIssuesStatus;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

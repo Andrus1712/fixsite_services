@@ -8,5 +8,9 @@ export class AvailableServicesDto {
   @IsArray()
   @IsOptional()
   @Type(() => Number)
-  issueIds?: number[];
+  orderServiceIds?: number[]; // IDs de orders_service, se resuelven a failure_code IDs internamente
+
+  @IsNumber()
+  @IsOptional()
+  orderId?: number;
 }

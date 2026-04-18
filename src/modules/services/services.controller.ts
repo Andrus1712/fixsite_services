@@ -138,7 +138,7 @@ export class ServicesController {
     @CurrentTenant() tenant: Tenant,
     @Body() dto: AvailableServicesDto,
   ) {
-    const raw = await this.servicesService.findAvailableServices(tenant, dto.orderTypeId, dto.issueIds ?? []);
+    const raw = await this.servicesService.findAvailableServices(tenant, dto.orderTypeId, dto.orderServiceIds ?? [], dto.orderId);
     const data = plainToInstance(AvailableServiceItemDto, raw, { excludeExtraneousValues: true });
     return { data, total: data.length };
   }

@@ -12,7 +12,7 @@ export { FailureSeverity } from './failure-severities.entity';
 export { InventoryAdjustmentItem } from './inventory-adjustment-item.entity';
 export { InventoryAdjustment } from './inventory-adjustment.entity';
 export { Inventory } from './inventory.entity';
-export { Issue } from './issue.entity';
+export { OrderIssue } from './issue.entity';
 export { LogEvents } from './log-events.entity';
 export { MaterialIssueItem } from './material-issue-items.entity';
 export { MaterialIssue } from './material-issues.entity';
