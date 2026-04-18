@@ -35,7 +35,6 @@ export class LogEventsController {
         @CurrentTenant() tenant: Tenant,
         @Param('order_id') orderId: number
     ) {
-        await new Promise(resolve => setTimeout(resolve, 3000));
         const data = await this.logEventService.getLogsByOrder(tenant, orderId);
 
         return {

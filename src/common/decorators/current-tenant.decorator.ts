@@ -4,6 +4,8 @@ import { Tenant } from '../../entities/global/tenant.entity';
 export const CurrentTenant = createParamDecorator(
   (data: unknown, ctx: ExecutionContext): Tenant => {
     const request = ctx.switchToHttp().getRequest();
+    console.log(request.tenant);
+    
     return request.tenant;
   },
 );

@@ -253,5 +253,35 @@ export class MaterialIssueService {
         return this.findOne(tenant, id);
     }
 
+    async findItemsByDestinationReference(tenant: Tenant, destinationReference: string) {
+        const connection = await this.tenantService.getTenantConnection(tenant);
+        const repository = connection.getRepository(MaterialIssueItem);
+
+        const queryBuilder = repository.createQueryBuilder('material_issue_items')
+            .select([
+                'material_issue_items.id AS id',
+                'material_issue_items.quantity AS quantity',
+                'material_issue_items.destinationReference AS destinationReference',
+                'issues.id AS issues_id',
+                'articles.id AS article_id',
+                'articles.name AS article_name',
+                'articles.sku AS article_sku',
+                'articles.unit_measurement AS article_unit_measurement',
+                'article_categories.name AS article_category_name',
+                'article_brands.name AS article_brand_name'
+            ])
+            .innerJoin('material_issue_items.issue', 'issues')
+            .innerJoin('material_issue_items.article', 'articles')
+            .innerJoin('articles.category', 'article_categories')
+            .innerJoin('articles.brand', 'article_brands')
+            .innerJoin('material_issue_items.order', 'order')
+            .where('material_issue_items.destinationReference = :destinationReference', { destinationReference });
+
+        const items = await queryBuilder.getRawMany();
+        console.log(items);
+        
+        return items;
+    }
+
 
 }

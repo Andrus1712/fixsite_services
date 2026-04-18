@@ -173,6 +173,10 @@ export class CreateOrderDto {
   timeline: TimelineDto;
 
   @IsNumber()
+  @IsOptional()
+  order_type_id?: number;
+
+  @IsNumber()
   priority: number;
 
   @IsOptional()

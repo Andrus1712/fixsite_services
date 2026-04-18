@@ -403,6 +403,13 @@ export class OrderResponseDto {
     @Expose()
     customer_id: number;
     @Expose()
+    order_type_id: number | null;
+
+    @Expose()
+    @Transform(({ obj }) => obj.orderType?.nombre ?? null)
+    order_type_name: string | null;
+
+    @Expose()
     assigned_technician_id: number | null;
 
     @Expose()

@@ -34,3 +34,7 @@ export { StockTransferItem } from './stock-transfer-item.entity';
 export { StockTransfer } from './stock-transfer.entity';
 export { Store } from './store.entity';
 export { Technician } from './technician.entity';
+export { Service } from './service.entity';
+export { OrderType } from './order-type.entity';
+export { ServiceOrderType } from './service-order-type.entity';
+export { OrderService } from './order-service.entity';

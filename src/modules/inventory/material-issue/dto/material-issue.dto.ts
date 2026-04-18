@@ -12,6 +12,24 @@ export class MaterialIssueItemDto {
 
     @Expose()
     destinationReference?: string;
+
+    @Expose()
+    article_name: string;
+
+    @Expose()
+    article_sku: string;
+
+    @Expose()
+    article_unit_measurement: string;
+
+    @Expose()
+    article_category_name: string;
+
+    @Expose()
+    article_brand_name: string;
+
+    @Expose()
+    order_code?: string;
 }
 
 export class MaterialIssueDto {

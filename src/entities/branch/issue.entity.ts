@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 't
 import { Order } from './order.entity';
 import { FailureCode } from './failure-codes.entity';
 
-@Entity('issues')
+@Entity('orders_issues')
 export class Issue {
   @PrimaryGeneratedColumn()
   id: number;

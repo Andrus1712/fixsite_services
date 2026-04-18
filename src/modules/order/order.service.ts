@@ -55,6 +55,7 @@ export class OrderService {
       priority: createOrderDto.priority,
       priority_description: this.getPriorityDescription(createOrderDto.priority),
       customer_id: customerId,
+      order_type_id: createOrderDto.order_type_id ?? null,
       estimated_cost: createOrderDto.cost_info.estimated_cost,
       labor_cost: createOrderDto.cost_info.labor_cost,
       parts_cost: createOrderDto.cost_info.parts_cost,
@@ -298,6 +299,7 @@ export class OrderService {
       .leftJoinAndSelect('failure_code.category', 'failure_category')
       .leftJoinAndSelect('failure_code.deviceType', 'issue_device_type')
       .leftJoinAndSelect('order.technician', 'technician')
+      .leftJoinAndSelect('order.orderType', 'orderType')
       .skip(skip)
       .take(limit)
       .orderBy('order.createdAt', 'DESC');
@@ -330,6 +332,7 @@ export class OrderService {
       .leftJoinAndSelect('failure_code.category', 'failure_category')
       .leftJoinAndSelect('failure_code.deviceType', 'issue_device_type')
       .leftJoinAndSelect('order.technician', 'technician')
+      .leftJoinAndSelect('order.orderType', 'orderType')
       .leftJoinAndSelect('order.notes', 'notes')
       .leftJoinAndSelect('order.technician', 'technicians')
       .where('order.order_code = :order_code', { order_code })

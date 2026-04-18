@@ -5,12 +5,12 @@ export class CreateMaterialIssueItemDto {
     @IsNumber()
     @IsPositive()
     @IsNotEmpty()
-    article_id: number;
+    article_id!: number;
 
     @IsNumber()
     @IsPositive()
     @IsNotEmpty()
-    quantity: number;
+    quantity!: number;
 
     @IsString()
     @IsOptional()
@@ -21,10 +21,14 @@ export class CreateMaterialIssueDto {
     @IsNumber()
     @IsPositive()
     @IsNotEmpty()
-    store_id: number;
+    store_id!: number;
 
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => CreateMaterialIssueItemDto)
-    items: CreateMaterialIssueItemDto[];
+    items!: CreateMaterialIssueItemDto[];
+
+    @IsString()
+    @IsOptional()
+    destinationReference?: string;
 }

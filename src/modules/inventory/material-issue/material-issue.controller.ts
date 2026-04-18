@@ -5,7 +5,7 @@ import { ResponseUtil } from "src/common/utils/response.util";
 import { Tenant } from "src/entities/global/tenant.entity";
 import { TenantSelectionGuard } from "src/modules/auth/guards/tenant-selection.guard";
 import { CreateMaterialIssueDto } from "./dto/create-material-issue.dto";
-import { MaterialIssueDto } from "./dto/material-issue.dto";
+import { MaterialIssueDto, MaterialIssueItemDto } from "./dto/material-issue.dto";
 import { UpdateMaterialIssueDto } from "./dto/update-material-issue.dto";
 import { MaterialIssueService } from "./material-issue.service";
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
@@ -38,6 +38,17 @@ export class MaterialIssueController {
                 totalPages: result.totalPages,
             }
         );
+    }
+
+    @Get('/items')
+    async getMaterialIssueItemsByDestinationReference(
+        @CurrentTenant() tenant: Tenant,
+        @Query('destinationReference') destinationReference: string
+    ) {
+        const result = await this.service.findItemsByDestinationReference(tenant, destinationReference);
+        const data = plainToInstance(MaterialIssueItemDto, result, { excludeExtraneousValues: true });
+
+        return ResponseUtil.success(data, 'Items de salida de material consultados correctamente');
     }
 
     @Get('/:id')
@@ -120,4 +131,5 @@ export class MaterialIssueController {
 
         return ResponseUtil.success(data, 'Salida de material cancelada correctamente');
     }
+    
 }

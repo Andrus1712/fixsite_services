@@ -7,6 +7,8 @@ import { Part } from './part.entity';
 import { StatusHistory } from './status-history.entity';
 import { Note } from './note.entity';
 import { LogEvents } from './log-events.entity';
+import { MaterialIssueItem } from './material-issue-items.entity';
+import { OrderType } from './order-type.entity';
 
 @Entity('orders')
 export class Order {
@@ -75,6 +77,13 @@ export class Order {
   customer: Customer;
 
   @Column({ nullable: true })
+  order_type_id: number;
+
+  @ManyToOne(() => OrderType, { nullable: true, eager: false })
+  @JoinColumn({ name: 'order_type_id' })
+  orderType: OrderType;
+
+  @Column({ nullable: true })
   assigned_technician_id: number;
 
   @ManyToOne(() => Technician, technician => technician.orders, { nullable: true })
@@ -98,6 +107,9 @@ export class Order {
 
   @OneToMany(() => LogEvents, log => log.order)
   logs: LogEvents[];
+
+  @OneToMany(() => MaterialIssueItem, item => item.order)
+  material_issue_items: MaterialIssueItem[];
 
   @CreateDateColumn()
   createdAt: Date;

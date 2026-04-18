@@ -24,6 +24,8 @@ import { LogEventsModule } from './modules/log-events/log-events.module';
 import { TechnicianModule } from './modules/technician/technician.module';
 import { InventoryModule } from './modules/inventory/Inventory.module';
 import { RealtimeModule } from './modules/realtime/realtime.module';
+import { ServicesModule } from './modules/services/services.module';
+import { OrderServiceModule } from './modules/order-service/order-service.module';
 
 @Module({
   imports: [
@@ -80,7 +82,9 @@ import { RealtimeModule } from './modules/realtime/realtime.module';
     LogEventsModule,
     TechnicianModule,
     InventoryModule,
-    RealtimeModule
+    RealtimeModule,
+    ServicesModule,
+    OrderServiceModule,
   ],
   controllers: [AppController],
   providers: [
@@ -127,6 +131,8 @@ export class AppModule implements NestModule {
         'material-issues/*path',
         'purchase-orders/*path',
         'stock-transfers/*path',
+        'services/*path',
+        'orders-service/*path',
       );
   }
 }

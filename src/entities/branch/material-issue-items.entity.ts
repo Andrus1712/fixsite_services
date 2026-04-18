@@ -1,6 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { MaterialIssue } from "./material-issues.entity";
 import { Article } from "./article.entity";
+import { Order } from "./order.entity";
 
 @Entity('material_issue_items')
 export class MaterialIssueItem {
@@ -18,4 +19,7 @@ export class MaterialIssueItem {
 
     @Column({ nullable: true })
     destinationReference: string; // service_order, disposal, transfer
+
+    @ManyToOne(() => Order, order => order.material_issue_items, { nullable: true })
+    order: Order;
 }
