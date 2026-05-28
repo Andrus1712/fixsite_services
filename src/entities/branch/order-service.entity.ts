@@ -1,9 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, JoinColumn, JoinTable, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  ManyToMany,
+  JoinColumn,
+  JoinTable,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Order } from './order.entity';
 import { Service } from './service.entity';
 import { OrderIssue } from './issue.entity';
 
-@Entity('orders_service')
+@Entity('order_services')
 export class OrderService {
   @PrimaryGeneratedColumn()
   id: number;
@@ -14,6 +24,14 @@ export class OrderService {
   @Column()
   service_id: number;
 
+  @ManyToOne(() => Order, { nullable: false })
+  @JoinColumn({ name: 'order_id' })
+  order: Order;
+
+  @ManyToOne(() => Service, { nullable: false })
+  @JoinColumn({ name: 'service_id' })
+  service: Service;
+
   @ManyToMany(() => OrderIssue, { nullable: true, eager: false })
   @JoinTable({
     name: 'order_service_issues',
@@ -23,21 +41,13 @@ export class OrderService {
   issues: OrderIssue[];
 
   @Column('decimal', { precision: 10, scale: 2, nullable: true })
-  precio: number;
+  price: number;
 
   @Column({ nullable: true })
-  tiempo_estimado_minutos: number;
+  estimated_minutes: number;
 
   @Column('text', { nullable: true })
-  notas: string;
-
-  @ManyToOne(() => Order, { nullable: false })
-  @JoinColumn({ name: 'order_id' })
-  order: Order;
-
-  @ManyToOne(() => Service, { nullable: false })
-  @JoinColumn({ name: 'service_id' })
-  service: Service;
+  notes: string;
 
   @CreateDateColumn()
   createdAt: Date;

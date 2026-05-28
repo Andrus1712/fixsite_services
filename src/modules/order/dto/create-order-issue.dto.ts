@@ -1,44 +1,34 @@
-import { IsString, IsNumber, IsArray, IsOptional, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString, IsNumber, IsArray, IsOptional } from 'class-validator';
 
 export class CreateOrderIssueDto {
   @IsNumber()
   order_id: number;
 
   @IsString()
-  issue_name: string;
+  title: string;
 
   @IsString()
-  issue_description: string;
+  description: string;
 
+  /** ID del código de falla del catálogo (FailureCode) */
   @IsNumber()
-  issue_type: number;
-
-  @IsNumber()
-  issue_severity: number;
-
-  @IsNumber()
-  issue_code: number;
-
   @IsOptional()
+  failure_code_id?: number;
+
   @IsString()
-  issue_additional_info?: string;
-
   @IsOptional()
+  additional_notes?: string;
+
   @IsArray()
-  issue_steps_to_reproduce?: string[];
-
   @IsOptional()
+  steps_to_reproduce?: string[];
+
   @IsString()
-  issue_environment?: string;
+  @IsOptional()
+  reported_by?: string;
 
   @IsOptional()
-  @IsString()
-  issue_additional_notes?: string;
-
-  @IsOptional()
-  @IsArray()
-  issue_files?: {
+  attachments?: {
     filename: string;
     originalName: string;
     size: string;

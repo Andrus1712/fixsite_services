@@ -7,24 +7,21 @@ export class CreateOrderServiceDto {
   @IsInt()
   service_id: number;
 
+  /** IDs de OrderIssue (fallas reportadas) que este servicio resuelve */
   @IsOptional()
   @IsArray()
   @IsInt({ each: true })
-  issues_ids?: number[];
+  issue_ids?: number[];
 
   @IsOptional()
   @IsNumber()
-  precio?: number;
+  price?: number;
 
   @IsOptional()
   @IsInt()
-  tiempo_estimado_minutos?: number;
+  estimated_minutes?: number;
 
   @IsOptional()
   @IsString()
-  notas?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  activo?: boolean;
+  notes?: string;
 }

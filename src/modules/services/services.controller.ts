@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  ParseIntPipe,
+  HttpStatus,
+} from '@nestjs/common';
 import { TenantSelectionGuard } from '../auth/guards/tenant-selection.guard';
 import { CurrentTenant } from '../../common/decorators/current-tenant.decorator';
 import { Tenant } from '../../entities/global/tenant.entity';
@@ -16,7 +28,7 @@ import { AvailableServiceItemDto } from './dto/available-service-response.dto';
 @Controller('services')
 @UseGuards(TenantSelectionGuard)
 export class ServicesController {
-  constructor(private readonly servicesService: ServicesService) {}
+  constructor(private readonly servicesService: ServicesService) { }
 
   // ── Services ──────────────────────────────────────────────────────────────
 
@@ -32,7 +44,12 @@ export class ServicesController {
     @Query('limit') limit = '10',
     @Query('filter') filter?: string,
   ) {
-    return this.servicesService.getAllServices(tenant, parseInt(page) || 1, parseInt(limit) || 10, filter);
+    return this.servicesService.getAllServices(
+      tenant,
+      parseInt(page) || 1,
+      parseInt(limit) || 10,
+      filter,
+    );
   }
 
   @Get(':id')
@@ -41,18 +58,25 @@ export class ServicesController {
   }
 
   @Post()
-  create(@CurrentTenant() tenant: Tenant, @Body() dto: CreateServiceDto) {
-    return this.servicesService.createService(tenant, dto);
+  async create(@CurrentTenant() tenant: Tenant, @Body() dto: CreateServiceDto) {
+    const data = await this.servicesService.createService(tenant, dto);
+    return { success: true, status: HttpStatus.CREATED, message: 'Servicio creado exitosamente', data, errors: null };
   }
 
   @Put(':id')
-  update(@CurrentTenant() tenant: Tenant, @Param('id', ParseIntPipe) id: number, @Body() dto: UpdateServiceDto) {
-    return this.servicesService.updateService(tenant, id, dto);
+  async update(
+    @CurrentTenant() tenant: Tenant,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateServiceDto,
+  ) {
+    const data = await this.servicesService.updateService(tenant, id, dto);
+    return { success: true, status: HttpStatus.OK, message: 'Servicio actualizado exitosamente', data, errors: null };
   }
 
   @Delete(':id')
-  remove(@CurrentTenant() tenant: Tenant, @Param('id', ParseIntPipe) id: number) {
-    return this.servicesService.removeService(tenant, id);
+  async remove(@CurrentTenant() tenant: Tenant, @Param('id', ParseIntPipe) id: number) {
+    await this.servicesService.removeService(tenant, id);
+    return { success: true, status: HttpStatus.OK, message: 'Servicio eliminado exitosamente', data: null, errors: null };
   }
 
   // ── Order Types ───────────────────────────────────────────────────────────
@@ -69,7 +93,12 @@ export class ServicesController {
     @Query('limit') limit = '10',
     @Query('filter') filter?: string,
   ) {
-    return this.servicesService.getAllOrderTypes(tenant, parseInt(page) || 1, parseInt(limit) || 10, filter);
+    return this.servicesService.getAllOrderTypes(
+      tenant,
+      parseInt(page) || 1,
+      parseInt(limit) || 10,
+      filter,
+    );
   }
 
   @Get('order-types/:id')
@@ -78,21 +107,28 @@ export class ServicesController {
   }
 
   @Post('order-types')
-  createOrderType(@CurrentTenant() tenant: Tenant, @Body() dto: CreateOrderTypeDto) {
-    return this.servicesService.createOrderType(tenant, dto);
+  async createOrderType(@CurrentTenant() tenant: Tenant, @Body() dto: CreateOrderTypeDto) {
+    const data = await this.servicesService.createOrderType(tenant, dto);
+    return { success: true, status: HttpStatus.CREATED, message: 'Tipo de orden creado exitosamente', data, errors: null };
   }
 
   @Put('order-types/:id')
-  updateOrderType(@CurrentTenant() tenant: Tenant, @Param('id', ParseIntPipe) id: number, @Body() dto: UpdateOrderTypeDto) {
-    return this.servicesService.updateOrderType(tenant, id, dto);
+  async updateOrderType(
+    @CurrentTenant() tenant: Tenant,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateOrderTypeDto,
+  ) {
+    const data = await this.servicesService.updateOrderType(tenant, id, dto);
+    return { success: true, status: HttpStatus.OK, message: 'Tipo de orden actualizado exitosamente', data, errors: null };
   }
 
   @Delete('order-types/:id')
-  removeOrderType(@CurrentTenant() tenant: Tenant, @Param('id', ParseIntPipe) id: number) {
-    return this.servicesService.removeOrderType(tenant, id);
+  async removeOrderType(@CurrentTenant() tenant: Tenant, @Param('id', ParseIntPipe) id: number) {
+    await this.servicesService.removeOrderType(tenant, id);
+    return { success: true, status: HttpStatus.OK, message: 'Tipo de orden eliminado exitosamente', data: null, errors: null };
   }
 
-  // ── Service Order Types ───────────────────────────────────────────────────
+  // ── Service Order Types (catálogo de precios) ─────────────────────────────
 
   @Get('service-order-types/all')
   getAllServiceOrderTypes(
@@ -117,29 +153,49 @@ export class ServicesController {
   }
 
   @Post('service-order-types')
-  createServiceOrderType(@CurrentTenant() tenant: Tenant, @Body() dto: CreateServiceOrderTypeDto) {
-    return this.servicesService.createServiceOrderType(tenant, dto);
+  async createServiceOrderType(
+    @CurrentTenant() tenant: Tenant,
+    @Body() dto: CreateServiceOrderTypeDto,
+  ) {
+    const data = await this.servicesService.createServiceOrderType(tenant, dto);
+    return { success: true, status: HttpStatus.CREATED, message: 'Precio de servicio creado exitosamente', data, errors: null };
   }
 
   @Put('service-order-types/:id')
-  updateServiceOrderType(@CurrentTenant() tenant: Tenant, @Param('id', ParseIntPipe) id: number, @Body() dto: UpdateServiceOrderTypeDto) {
-    return this.servicesService.updateServiceOrderType(tenant, id, dto);
+  async updateServiceOrderType(
+    @CurrentTenant() tenant: Tenant,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateServiceOrderTypeDto,
+  ) {
+    const data = await this.servicesService.updateServiceOrderType(tenant, id, dto);
+    return { success: true, status: HttpStatus.OK, message: 'Precio de servicio actualizado exitosamente', data, errors: null };
   }
 
   @Delete('service-order-types/:id')
-  removeServiceOrderType(@CurrentTenant() tenant: Tenant, @Param('id', ParseIntPipe) id: number) {
-    return this.servicesService.removeServiceOrderType(tenant, id);
+  async removeServiceOrderType(@CurrentTenant() tenant: Tenant, @Param('id', ParseIntPipe) id: number) {
+    await this.servicesService.removeServiceOrderType(tenant, id);
+    return { success: true, status: HttpStatus.OK, message: 'Precio de servicio eliminado exitosamente', data: null, errors: null };
   }
 
-  // ── Available Services ─────────────────────────────────────────────────────────────
+  // ── Available Services ────────────────────────────────────────────────────
 
+  /**
+   * Devuelve los servicios disponibles para una orden.
+   * Body: { orderTypeId, orderIssueIds?: number[], orderId?: number }
+   * orderIssueIds son IDs de OrderIssue (fallas reportadas) pendientes.
+   */
   @Post('available')
   async findAvailableServices(
     @CurrentTenant() tenant: Tenant,
     @Body() dto: AvailableServicesDto,
   ) {
-    const raw = await this.servicesService.findAvailableServices(tenant, dto.orderTypeId, dto.orderServiceIds ?? [], dto.orderId);
+    const raw = await this.servicesService.findAvailableServices(
+      tenant,
+      dto.orderTypeId,
+      dto.orderIssueIds ?? [],
+      dto.orderId,
+    );
     const data = plainToInstance(AvailableServiceItemDto, raw, { excludeExtraneousValues: true });
-    return { data, total: data.length };
+    return { success: true, status: HttpStatus.OK, data, total: data.length };
   }
 }

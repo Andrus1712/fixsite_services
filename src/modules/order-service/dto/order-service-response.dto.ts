@@ -5,10 +5,10 @@ export class OrderServiceIssueResponseDto {
   id: number;
 
   @Expose()
-  issue_name: string;
+  title: string;
 
   @Expose()
-  issue_description: string;
+  description: string;
 
   @Expose()
   status: string;
@@ -17,12 +17,12 @@ export class OrderServiceIssueResponseDto {
   is_resolved: boolean;
 
   @Expose()
-  @Transform(({ obj }) => obj.issue_code?.code ?? null)
+  @Transform(({ obj }) => obj.failureCode?.code ?? null)
   failure_code: string | null;
 
   @Expose()
-  @Transform(({ obj }) => obj.issue_code?.name ?? null)
-  failure_name: string | null;
+  @Transform(({ obj }) => obj.failureCode?.name ?? null)
+  failure_code_name: string | null;
 }
 
 export class OrderServiceServiceDto {
@@ -30,16 +30,16 @@ export class OrderServiceServiceDto {
   id: number;
 
   @Expose()
-  codigo: string;
+  code: string;
 
   @Expose()
-  descripcion: string;
+  description: string;
 
   @Expose()
-  precio_base: number;
+  base_price: number;
 
   @Expose()
-  activo: boolean;
+  is_active: boolean;
 }
 
 export class OrderServiceResponseDto {
@@ -57,13 +57,13 @@ export class OrderServiceResponseDto {
   service: OrderServiceServiceDto;
 
   @Expose()
-  precio: number;
+  price: number;
 
   @Expose()
-  tiempo_estimado_minutos: number;
+  estimated_minutes: number;
 
   @Expose()
-  notas: string;
+  notes: string;
 
   @Expose()
   @Type(() => OrderServiceIssueResponseDto)

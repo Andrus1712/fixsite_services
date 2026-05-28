@@ -201,7 +201,7 @@ export class StoreService {
                 NULL as reason
             FROM material_issues mi
             LEFT JOIN stores store ON mi."storeId" = store.id
-            LEFT JOIN material_issue_items items ON items."issueId" = mi.id
+            LEFT JOIN material_issue_items items ON items."materialIssueId" = mi.id
             WHERE store.id = $2
             GROUP BY mi.id, mi.status, mi."createdBy", mi."createdAt", store.id, store.name
         `;

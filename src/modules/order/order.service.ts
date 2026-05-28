@@ -1,16 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateOrderIssueDto } from './dto/create-order-issue.dto';
-import { Order, Customer, Device, OrderIssue, DeviceModel, Note, LogEvents } from '../../entities/branch';
+import { Order, Customer, Device, OrderIssue, DeviceModel, Note } from '../../entities/branch';
 import { Tenant } from '../../entities/global/tenant.entity';
 import { ConnectionDatabaseService } from 'src/database/connection-database.service';
 import { EntityManager } from 'typeorm';
-import { LogStatus, LogType } from 'src/entities/branch/log-events.entity';
+import { LogType } from 'src/entities/branch/log-events.entity';
+import { LogEventService } from '../log-events/logs-events.service';
+import { OrderStatusEnum, ORDER_STATUS_DESCRIPTIONS, ORDER_STATUS_LABELS, VALID_TRANSITIONS } from 'src/common/enums';
 
 @Injectable()
 export class OrderService {
   constructor(
     private readonly tenantService: ConnectionDatabaseService,
+    private readonly logEventService: LogEventService
   ) { }
 
   async create(tenant: Tenant, createOrderDto: CreateOrderDto, author: string) {
@@ -26,7 +29,19 @@ export class OrderService {
       const issuesWithRelations = await this.loadIssuesWithRelations(manager, issues);
       const deviceWithRelations = await this.loadDeviceWithRelations(manager, device);
 
-      await this.createAndSaveLogEvent(manager, order, device, issues, notes, author);
+      await this.logEventService.logWithManager(manager, {
+        orderId: order.id,
+        type: LogType.ORDER_CREATED,
+        title: 'Orden de reparación creada',
+        description: `Se ha registrado una nueva orden de reparación con código ${order.order_code}.`,
+        user: author,
+        icon: 'order_created',
+        metadata: {
+          order_code: order.order_code,
+          device: device.device_name,
+          issues_count: issues.length,
+        },
+      });
 
       return this.buildCreateOrderResponse(order, customer, deviceWithRelations, issuesWithRelations, notes);
     });
@@ -34,7 +49,7 @@ export class OrderService {
 
   private async findCustomerById(manager: any, customerData: any) {
     const customer = await manager.findOne(Customer, {
-      where: { id: customerData.customer_id }
+      where: { id: customerData.customer_id },
     });
 
     if (!customer) {
@@ -45,14 +60,13 @@ export class OrderService {
   }
 
   private async createOrder(manager: any, createOrderDto: CreateOrderDto, customerId: number) {
-
     const orderCode = await this.generateOrderCode(manager);
 
     const order = manager.create(Order, {
       order_code: orderCode,
       description: createOrderDto.description,
-      status: 1,
-      status_description: 'pending',
+      status: OrderStatusEnum.PENDING,
+      status_description: ORDER_STATUS_DESCRIPTIONS[OrderStatusEnum.PENDING],
       priority: createOrderDto.priority,
       priority_description: this.getPriorityDescription(createOrderDto.priority),
       customer_id: customerId,
@@ -61,9 +75,7 @@ export class OrderService {
       labor_cost: createOrderDto.cost_info.labor_cost,
       parts_cost: createOrderDto.cost_info.parts_cost,
       currency: createOrderDto.cost_info.currency,
-      // estimated_completion: new Date(createOrderDto.timeline.estimated_completion),
       estimated_hours: createOrderDto.timeline.estimated_hours,
-      // sla_deadline: new Date(createOrderDto.timeline.sla_deadline),
     });
 
     return await manager.save(Order, order);
@@ -76,9 +88,7 @@ export class OrderService {
     const lastOrder = await manager
       .getRepository(Order)
       .createQueryBuilder('o')
-      .where('o.order_code LIKE :pattern', {
-        pattern: `${prefix}${datePart}-%`,
-      })
+      .where('o.order_code LIKE :pattern', { pattern: `${prefix}${datePart}-%` })
       .orderBy('o.order_code', 'DESC')
       .getOne();
 
@@ -86,10 +96,8 @@ export class OrderService {
 
     if (lastOrder) {
       const lastPart = lastOrder.order_code.split('-').pop();
-
       if (lastPart) {
-        const lastSeq = Number(lastPart);
-        nextSequence = lastSeq + 1;
+        nextSequence = Number(lastPart) + 1;
       }
     }
 
@@ -113,9 +121,7 @@ export class OrderService {
   }
 
   private async findDeviceModelById(manager: any, model_id: string) {
-    const deviceModel = await manager.findOne(DeviceModel, {
-      where: { id: model_id }
-    });
+    const deviceModel = await manager.findOne(DeviceModel, { where: { id: model_id } });
 
     if (!deviceModel) {
       throw new Error(`Device Model with ID ${model_id} does not exist`);
@@ -128,12 +134,17 @@ export class OrderService {
     const issues: OrderIssue[] = [];
 
     for (const issueData of issuesData) {
-      const issueDataWithDefaults = {
-        ...this.buildIssueData(issueData),
-        order_id: orderId
-      };
-
-      const issue = manager.create(OrderIssue, issueDataWithDefaults);
+      const issue = manager.create(OrderIssue, {
+        title: issueData.title,
+        description: issueData.description,
+        failure_code_id: issueData.failure_code_id ?? null,
+        additional_notes: issueData.additional_notes ?? null,
+        steps_to_reproduce: issueData.steps_to_reproduce ?? null,
+        reported_by: issueData.reported_by ?? 'customer',
+        reported_date: new Date(),
+        attachments: issueData.attachments ?? null,
+        order_id: orderId,
+      });
       const savedIssue = await manager.save(OrderIssue, issue);
       issues.push(savedIssue);
     }
@@ -144,20 +155,17 @@ export class OrderService {
   private async createOrderNotes(manager: any, notesData: any[], orderId: number, author: string) {
     const notes: Note[] = [];
 
-    if (!notesData) {
-      return notes;
-    }
+    if (!notesData) return notes;
 
     for (const noteData of notesData) {
       const { content, type } = noteData;
       const note = manager.create(Note, {
-        type: type,
-        content: content,
+        type,
+        content,
         order: orderId,
-        author: author,
+        author,
         timestamp: new Date(),
       });
-
       const savedNote = await manager.save(Note, note);
       notes.push(savedNote);
     }
@@ -169,56 +177,19 @@ export class OrderService {
     return await manager.getRepository(OrderIssue).find({
       where: issues.map(i => ({ id: i.id })),
       relations: [
-        'issue_code',
-        'issue_code.severity',
-        'issue_code.category',
-        'issue_code.deviceType'
-      ]
+        'failureCode',
+        'failureCode.severity',
+        'failureCode.category',
+        'failureCode.deviceType',
+      ],
     });
   }
 
   private async loadDeviceWithRelations(manager: any, device: Device) {
     return await manager.getRepository(Device).findOne({
       where: { id: device.id },
-      relations: ['deviceModel', 'deviceModel.deviceType', 'deviceModel.deviceBrand']
+      relations: ['deviceModel', 'deviceModel.deviceType', 'deviceModel.deviceBrand'],
     });
-  }
-
-  private async createAndSaveLogEvent(
-    manager: any,
-    order: Order,
-    device: Device,
-    issues: OrderIssue[],
-    notes: Note[],
-    author: string
-  ) {
-    const logEvent = manager.create(LogEvents, {
-      title: `Orden de reparacion creada`,
-      description: `Se ha registrado una nueva orden de reparación en el sistema con código ${order.order_code}.`,
-      type: LogType.CREATED,
-      status: LogStatus.SUCCESS,
-      user: author,
-      order: order,
-      icon: 'order_created',
-      metadata: this.buildLogEventMetadata(order, device, issues, notes, author),
-      timestamp: new Date()
-    });
-
-    await manager.save(LogEvents, logEvent);
-  }
-
-  private buildLogEventMetadata(
-    order: Order,
-    device: Device,
-    issues: OrderIssue[],
-    notes: Note[],
-    author: string
-  ): Record<string, any> {
-    return {
-      "Codigo": order.order_code,
-      "Dispositivo": device.device_name,
-      "Daños reportados": issues.length,
-    };
   }
 
   private buildCreateOrderResponse(
@@ -226,14 +197,14 @@ export class OrderService {
     customer: Customer,
     deviceWithRelations: Device,
     issuesWithRelations: OrderIssue[],
-    notes: Note[]
+    notes: Note[],
   ) {
     return {
       ...order,
       customer,
       devices: [deviceWithRelations],
       issues: issuesWithRelations,
-      notes
+      notes,
     };
   }
 
@@ -242,66 +213,26 @@ export class OrderService {
     return priorities[priority] || 'medium';
   }
 
-  private getIssueTypeDescription(type: number): string {
-    const types = { 1: 'hardware', 2: 'screen', 3: 'software', 4: 'battery' };
-    return types[type] || 'hardware';
+  private getStatusDescription(status: number): string {
+    return ORDER_STATUS_DESCRIPTIONS[status as OrderStatusEnum] || 'unknown';
   }
 
-  private getSeverityDescription(severity: number): string {
-    const severities = { 1: 'low', 2: 'medium', 3: 'high', 4: 'critical' };
-    return severities[severity] || 'medium';
-  }
-
-  private buildIssueData(issueData: any): any {
-    return {
-      ...issueData,
-      issue_code: { id: issueData.issue_code },
-      issue_type_description: this.getIssueTypeDescription(issueData.issue_type),
-      issue_severity_description: this.getSeverityDescription(issueData.issue_severity),
-      issue_reproducibility: 1,
-      issue_reproducibility_description: 'always',
-      issue_frequency: 1,
-      issue_frequency_description: 'always',
-      issue_impact: issueData.issue_severity,
-      issue_impact_description: this.getSeverityDescription(issueData.issue_severity),
-      issue_difficulty: 2,
-      issue_difficulty_description: 'medium',
-      issue_priority: issueData.issue_severity,
-      issue_priority_description: this.getSeverityDescription(issueData.issue_severity),
-      issue_urgency: issueData.issue_severity,
-      issue_urgency_description: this.getSeverityDescription(issueData.issue_severity),
-      issue_detection: 1,
-      issue_detection_description: 'immediate',
-      issue_reported_by: 'customer',
-      issue_reported_date: new Date(),
-      issue_reported_time: new Date().toTimeString().slice(0, 5),
-      order_id: issueData.orderId,
-    };
-  }
-
-  async getAllOrders(
-    tenant: Tenant,
-    page = 1,
-    limit = 10,
-    filter?: string,
-  ) {
+  async getAllOrders(tenant: Tenant, page = 1, limit = 10, filter?: string) {
     const connection = await this.tenantService.getConnection(tenant);
     const repo = connection.getRepository(Order);
-
-    const skip = (page - 1) * limit;
 
     const qb = repo
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.customer', 'customer')
       .leftJoinAndSelect('order.devices', 'devices')
       .leftJoinAndSelect('order.issues', 'issues')
-      .leftJoinAndSelect('issues.issue_code', 'failure_code')
+      .leftJoinAndSelect('issues.failureCode', 'failure_code')
       .leftJoinAndSelect('failure_code.severity', 'failure_severity')
       .leftJoinAndSelect('failure_code.category', 'failure_category')
       .leftJoinAndSelect('failure_code.deviceType', 'issue_device_type')
       .leftJoinAndSelect('order.technician', 'technician')
       .leftJoinAndSelect('order.orderType', 'orderType')
-      .skip(skip)
+      .skip((page - 1) * limit)
       .take(limit)
       .orderBy('order.createdAt', 'DESC');
 
@@ -313,13 +244,13 @@ export class OrderService {
     }
 
     const [items, total] = await qb.getManyAndCount();
-
     return { items, total };
   }
 
   async getOrderInfo(tenant: Tenant, order_code: string) {
     const connection = await this.tenantService.getConnection(tenant);
     const repo = connection.getRepository(Order);
+
     const order = await repo
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.customer', 'customer')
@@ -328,24 +259,24 @@ export class OrderService {
       .leftJoinAndSelect('deviceModel.deviceType', 'deviceType')
       .leftJoinAndSelect('deviceModel.deviceBrand', 'deviceBrand')
       .leftJoinAndSelect('order.issues', 'issues')
-      .leftJoinAndSelect('issues.issue_code', 'failure_code')
+      .leftJoinAndSelect('issues.failureCode', 'failure_code')
       .leftJoinAndSelect('failure_code.severity', 'failure_severity')
       .leftJoinAndSelect('failure_code.category', 'failure_category')
       .leftJoinAndSelect('failure_code.deviceType', 'issue_device_type')
       .leftJoinAndSelect('order.technician', 'technician')
       .leftJoinAndSelect('order.orderType', 'orderType')
       .leftJoinAndSelect('order.notes', 'notes')
-      .leftJoinAndSelect('order.technician', 'technicians')
       .where('order.order_code = :order_code', { order_code })
       .getOne();
 
     if (!order) {
       throw new NotFoundException('Order not found');
     }
+
     return order;
   }
 
-  async createIssue(tenant: Tenant, dto: CreateOrderIssueDto) {
+  async createIssue(tenant: Tenant, dto: CreateOrderIssueDto, author: string) {
     const connection = await this.tenantService.getConnection(tenant);
 
     return await connection.transaction(async (manager) => {
@@ -354,33 +285,53 @@ export class OrderService {
         throw new NotFoundException(`Order with ID ${dto.order_id} not found`);
       }
 
-      const { order_id, issue_code, ...rest } = dto;
-      const issueData = this.buildIssueData({ ...rest, issue_code });
-
-      // Separar la relación del resto para evitar que TypeORM intente hacer upsert
-      const { issue_code: issueCodeRelation, ...issueFields } = issueData;
-
       const issue = manager.create(OrderIssue, {
-        ...issueFields,
-        order_id,
-        issue_code: { id: issue_code } as any,
-      });
+        title: dto.title,
+        description: dto.description,
+        failure_code_id: dto.failure_code_id ?? null,
+        additional_notes: dto.additional_notes ?? null,
+        steps_to_reproduce: dto.steps_to_reproduce ?? null,
+        reported_by: dto.reported_by ?? 'customer',
+        reported_date: new Date(),
+        attachments: (dto.attachments ?? null) as any,
+        order_id: dto.order_id,
+      } as any);
+
 
       const saved = await manager.save(OrderIssue, issue);
 
+      await this.logEventService.logWithManager(manager, {
+        orderId: order.id,
+        type: LogType.ISSUE_ADDED,
+        title: 'Falla reportada',
+        description: `Se agregó la falla "${dto.title}" a la orden ${order.order_code}.`,
+        user: author,
+        icon: 'issue_added',
+        metadata: {
+          order_code: order.order_code,
+          issue_id: saved.id,
+          issue_title: dto.title,
+          failure_code_id: dto.failure_code_id ?? null,
+        },
+      });
+
       return manager.getRepository(OrderIssue).findOne({
         where: { id: saved.id },
-        relations: ['issue_code', 'issue_code.severity', 'issue_code.category', 'issue_code.deviceType'],
+        relations: [
+          'failureCode',
+          'failureCode.severity',
+          'failureCode.category',
+          'failureCode.deviceType',
+        ],
       });
     });
   }
 
   async assignOrder(tenant: Tenant, body: any, author: string) {
     const connection = await this.tenantService.getConnection(tenant);
+
     return await connection.transaction(async (manager) => {
-      const order = await manager.findOne(Order, {
-        where: { order_code: body.orderCode }
-      });
+      const order = await manager.findOne(Order, { where: { order_code: body.orderCode } });
 
       if (!order) {
         throw new NotFoundException('Order not found');
@@ -388,9 +339,160 @@ export class OrderService {
 
       order.assigned_technician_id = body.technicianId;
 
+      // Si la orden está en PENDING, avanzar a ASSIGNED automáticamente
+      if (order.status === OrderStatusEnum.PENDING) {
+        order.status = OrderStatusEnum.ASSIGNED;
+        order.status_description = ORDER_STATUS_DESCRIPTIONS[OrderStatusEnum.ASSIGNED];
+      }
+
       await manager.save(Order, order);
+
+      await this.logEventService.logWithManager(manager, {
+        orderId: order.id,
+        type: LogType.ORDER_ASSIGNED,
+        title: 'Técnico asignado',
+        description: `Se asignó un técnico a la orden ${order.order_code}.`,
+        user: author,
+        icon: 'technician_assigned',
+        metadata: {
+          order_code: order.order_code,
+          technician_id: body.technicianId,
+        },
+      });
 
       return order;
     });
+  }
+
+  async updateOrderStatus(tenant: Tenant, orderCode: string, status: number, author: string, notes?: string) {
+    const connection = await this.tenantService.getConnection(tenant);
+
+    const order = await connection.getRepository(Order).findOne({
+      where: { order_code: orderCode },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    const currentStatus = order.status as OrderStatusEnum;
+    const newStatus = status as OrderStatusEnum;
+
+    // Validar que el nuevo estado existe en el enum
+    if (!ORDER_STATUS_DESCRIPTIONS[newStatus]) {
+      throw new BadRequestException(`Estado ${status} no es válido`);
+    }
+
+    // Validar transición permitida
+    const allowedTransitions = VALID_TRANSITIONS[currentStatus];
+    if (!allowedTransitions || !allowedTransitions.includes(newStatus)) {
+      throw new BadRequestException(
+        `Transición no permitida: no se puede pasar de "${ORDER_STATUS_LABELS[currentStatus]}" a "${ORDER_STATUS_LABELS[newStatus]}"`
+      );
+    }
+
+    // Si va a WAITING_PARTS, las notas son obligatorias
+    if (newStatus === OrderStatusEnum.WAITING_PARTS && !notes) {
+      throw new BadRequestException('Se requiere una observación al marcar como "Esperando repuestos"');
+    }
+
+    const previousStatus = order.status;
+    order.status = newStatus;
+    order.status_description = ORDER_STATUS_DESCRIPTIONS[newStatus];
+
+    // Si se completa, registrar fecha de completado
+    if (newStatus === OrderStatusEnum.COMPLETED) {
+      order.actual_completion = new Date();
+    }
+
+    await connection.getRepository(Order).save(order);
+
+    await this.logEventService.log(tenant, {
+      orderId: order.id,
+      type: LogType.ORDER_STATUS_CHANGE,
+      title: 'Estado de orden actualizado',
+      description: `El estado de la orden ${orderCode} fue actualizado de "${ORDER_STATUS_LABELS[previousStatus as OrderStatusEnum]}" a "${ORDER_STATUS_LABELS[newStatus]}".`,
+      user: author,
+      icon: 'status_updated',
+      metadata: {
+        order_code: order.order_code,
+        previous_status: previousStatus,
+        previous_status_description: ORDER_STATUS_DESCRIPTIONS[previousStatus as OrderStatusEnum],
+        new_status: newStatus,
+        new_status_description: ORDER_STATUS_DESCRIPTIONS[newStatus],
+        notes: notes ?? null,
+      },
+    });
+
+    return order;
+  }
+  async getOrderTimeline(tenant: Tenant, orderCode: string) {
+    const connection = await this.tenantService.getConnection(tenant);
+    const orderRepo = connection.getRepository(Order);
+
+    const order = await orderRepo.findOne({ where: { order_code: orderCode } });
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return this.logEventService.getTimeline(tenant, order.id);
+  }
+  async getOrdersByCustomer(tenant: Tenant, customerId: number) {
+    const connection = await this.tenantService.getConnection(tenant);
+    const repo = connection.getRepository(Order);
+
+    return await repo.find({
+      where: { customer: { id: customerId } },
+      relations: [
+        'customer',
+        'devices',
+        'issues',
+        'issues.failureCode',
+        'issues.failureCode.severity',
+        'issues.failureCode.category',
+        'issues.failureCode.deviceType',
+        'technician',
+        'orderType',
+      ],
+      order: { createdAt: 'DESC' },
+    });
+  }
+  async getOrdersByTechnician(tenant: Tenant, technicianId: number) {
+    const connection = await this.tenantService.getConnection(tenant);
+    const repo = connection.getRepository(Order);
+
+    return await repo.find({
+      where: { assigned_technician_id: technicianId },
+      relations: [
+        'customer',
+        'devices',
+        'issues',
+        'issues.failureCode',
+        'issues.failureCode.severity',
+        'issues.failureCode.category',
+        'issues.failureCode.deviceType',
+        'technician',
+        'orderType',
+      ],
+      order: { createdAt: 'DESC' },
+    });
+  }
+  async getOrdersGroupedByStatus(tenant: Tenant) {
+    const connection = await this.tenantService.getConnection(tenant);
+    const repo = connection.getRepository(Order);
+
+    const result = await repo
+      .createQueryBuilder('order')
+      .select('order.status', 'status')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('order.status')
+      .getRawMany();
+
+    return result.map(item => ({
+      status: parseInt(item.status),
+      count: parseInt(item.count),
+      description: ORDER_STATUS_DESCRIPTIONS[parseInt(item.status) as OrderStatusEnum] || 'unknown',
+      label: ORDER_STATUS_LABELS[parseInt(item.status) as OrderStatusEnum] || 'Desconocido',
+    }));
   }
 }

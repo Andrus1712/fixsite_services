@@ -1,35 +1,31 @@
-import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsEnum, IsObject, IsTimeZone, IsDate } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsObject, IsNumber, IsNotEmpty } from 'class-validator';
 import { LogStatus, LogType } from 'src/entities/branch/log-events.entity';
 
 export class CreateLogEventDto {
+    @IsNumber()
+    @IsNotEmpty()
+    order_id: number;
+
+    @IsEnum(LogType)
+    type: LogType;
+
     @IsString()
+    @IsNotEmpty()
     title: string;
 
     @IsOptional()
     @IsString()
     description?: string;
 
-    @Type(() => Date)
-    @IsDate()
-    timestamp: Date;
-
-    @IsEnum(LogType)
-    type: LogType;
-
-    @IsOptional()
-    @IsEnum(LogStatus)
-    status?: LogStatus;
-
     @IsOptional()
     @IsString()
-    user?: string;
+    icon?: string;
 
     @IsOptional()
     @IsObject()
     metadata?: Record<string, any>;
 
     @IsOptional()
-    @IsString()
-    icon?: string;
+    @IsEnum(LogStatus)
+    status?: LogStatus;
 }

@@ -1,0 +1,3052 @@
+{
+    "info": {
+        "name": "FixSite - API Documentation",
+        "description": "API REST de FixSite Services.\n\n## Autenticación\nBasada en cookies httpOnly. El cliente DEBE enviar `credentials: 'include'` (fetch) o `withCredentials: true` (axios).\n\n## Tenant\nResolver por header `X-Tenant-ID` o subdominio.\n\n## Flujo de auth\n1. POST /auth/login → cookie `access_token` (type: temp)\n2. POST /auth/select-tenant → cookie actualizada (type: full + tenantId)\n3. Todas las rutas de negocio requieren token full\n\n## Cambios recientes (refactoring)\n- `OrderIssue`: campos simplificados. `issue_name→title`, `issue_description→description`, `issue_code_id→failure_code_id`\n- `Service`: `codigo→code`, `descripcion→description`, `precio_base→base_price`, `activo→is_active`\n- `ServiceOrderType`: `issue_id→failure_code_id`, `precio→price`, `tiempo_estimado_minutos→estimated_minutes`, `activo→is_active`\n- `OrderService`: `precio→price`, `tiempo_estimado_minutos→estimated_minutes`, `notas→notes`, tabla `orders_service→order_services`\n- `AvailableServices`: body `orderServiceIds→orderIssueIds` (ahora recibe IDs de OrderIssue directamente)",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "noauth"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3000",
+            "type": "string"
+        },
+        {
+            "key": "tenantId",
+            "value": "your-tenant-id",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Auth",
+            "description": "Autenticación JWT con cookies httpOnly. Flujo: login → select-tenant → usar API.",
+            "item": [
+                {
+                    "name": "Register",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Juan Perez\",\n  \"email\": \"juan@example.com\",\n  \"username\": \"juanperez\",\n  \"password\": \"secret123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"juanperez\",\n  \"password\": \"secret123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "Establece cookie httpOnly `access_token` con type:temp (24h). El cliente debe usar `credentials: include`."
+                    }
+                },
+                {
+                    "name": "Select Tenant",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/select-tenant",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "select-tenant"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"tenantId\": \"{{tenantId}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "Actualiza cookie con type:full + tenantId. Requiere token temp válido."
+                    }
+                },
+                {
+                    "name": "Switch Tenant",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/switch-tenant",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "switch-tenant"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"tenantId\": \"{{tenantId}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Logout Tenant",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/logout-tenant",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "logout-tenant"
+                            ]
+                        },
+                        "description": "Remueve tenantId de la cookie. Requiere token full."
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/logout",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "logout"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Check Auth",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/check",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "check"
+                            ]
+                        },
+                        "description": "Retorna usuario autenticado y tenantId. Requiere token full."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Global - Tenants",
+            "item": [
+                {
+                    "name": "Create Tenant",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/tenants",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tenants"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Mi Empresa\",\n  \"subdomain\": \"miempresa\",\n  \"dbHost\": \"localhost\",\n  \"dbPort\": 5432,\n  \"dbUsername\": \"postgres\",\n  \"dbPassword\": \"password\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Tenants",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/tenants/all?page=1&limit=10&filter=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tenants",
+                                "all"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "filter",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Current Tenant",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/tenants/current",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tenants",
+                                "current"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Global - Users",
+            "item": [
+                {
+                    "name": "Get All Users (paginated)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/all?page=1&limit=10&filter=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "all"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "filter",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Users (list)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get User by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "user-uuid"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Juan Perez\",\n  \"email\": \"juan@example.com\",\n  \"username\": \"juanperez\",\n  \"password\": \"secret123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Update User",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "user-uuid"
+                                }
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Juan Perez Actualizado\",\n  \"email\": \"juan@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Delete User",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "user-uuid"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Global - Permissions",
+            "item": [
+                {
+                    "name": "Get All Roles",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/permissions/roles",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "permissions",
+                                "roles"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Role by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/permissions/roles/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "permissions",
+                                "roles",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "role-uuid"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/permissions/roles",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "permissions",
+                                "roles"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Tecnico\",\n  \"description\": \"Rol para tecnicos de servicio\",\n  \"permissions\": [1, 2, 3]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Update Role",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/permissions/roles/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "permissions",
+                                "roles",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "role-uuid"
+                                }
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Tecnico Senior\",\n  \"permissions\": [1, 2, 3, 4]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Role",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/permissions/roles/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "permissions",
+                                "roles",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "role-uuid"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Permissions by Role",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/permissions/role/:roleId",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "permissions",
+                                "role",
+                                ":roleId"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "roleId",
+                                    "value": "role-uuid"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Permissions",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/permissions",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "permissions"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Modules",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/permissions/modules",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "permissions",
+                                "modules"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Module",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/permissions/modules",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "permissions",
+                                "modules"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Inventario\",\n  \"description\": \"Modulo de gestion de inventario\",\n  \"icon\": \"inventory\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Components",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/permissions/components",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "permissions",
+                                "components"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Component",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/permissions/components",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "permissions",
+                                "components"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"moduleIds\": [\"module-uuid\"],\n  \"label\": \"Lista de Articulos\",\n  \"title\": \"Articulos\",\n  \"componentKey\": \"articles-list\",\n  \"option\": \"view\",\n  \"action\": \"read\",\n  \"path\": \"/inventory/articles\",\n  \"icon\": \"list\",\n  \"order\": 1,\n  \"showMenu\": true,\n  \"type\": \"page\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Create Permission",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/permissions",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "permissions"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"componentId\": \"component-uuid\",\n  \"assignedBy\": \"admin\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Customers",
+            "item": [
+                {
+                    "name": "Get All Customers",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/customers?page=1&limit=10&filter=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "customers"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "filter",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Customer by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/customers/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "customers",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Customer",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/customers",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "customers"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"customer_name\": \"Carlos Lopez\",\n  \"customer_email\": \"carlos@example.com\",\n  \"customer_phone\": \"+57 300 123 4567\",\n  \"customer_address\": \"Calle 123 #45-67\",\n  \"customer_city\": \"Bogota\",\n  \"customer_country\": \"Colombia\",\n  \"customer_type\": \"individual\",\n  \"preferred_contact\": \"email\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Update Customer",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/customers/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "customers",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"customer_phone\": \"+57 300 999 8888\",\n  \"customer_address\": \"Nueva Direccion 456\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Customer",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/customers/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "customers",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Technicians",
+            "item": [
+                {
+                    "name": "Get All Technicians",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/technicians/all?page=1&limit=10&filter=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "technicians",
+                                "all"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "filter",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Technician",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/technicians/create",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "technicians",
+                                "create"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Pedro Ramirez\",\n  \"email\": \"pedro@fixsite.com\",\n  \"phone\": \"+57 310 555 1234\",\n  \"certification\": \"Apple Certified\",\n  \"specialty\": \"iPhone\",\n  \"level\": \"senior\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Orders",
+            "description": "Gestión de órdenes de servicio. Cada orden tiene dispositivos, fallas (OrderIssue) y servicios aplicados (OrderService).",
+            "item": [
+                {
+                    "name": "Create Order",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders/create",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders",
+                                "create"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"description\": \"Pantalla rota y bateria agotada\",\n  \"serviceType\": 1,\n  \"priority\": 2,\n  \"order_type_id\": 1,\n  \"device_data\": {\n    \"device_name\": \"iPhone 13\",\n    \"device_type\": 1,\n    \"device_brand\": 1,\n    \"device_model\": 1,\n    \"serial_number\": \"SN123456789\",\n    \"imei\": \"123456789012345\",\n    \"model_year\": \"2021\",\n    \"color\": \"Negro\",\n    \"storage_capacity\": \"128GB\"\n  },\n  \"issues\": [\n    {\n      \"title\": \"Pantalla rota\",\n      \"description\": \"La pantalla tiene una grieta diagonal\",\n      \"failure_code_id\": 1,\n      \"additional_notes\": \"Ocurrio por caida\",\n      \"steps_to_reproduce\": [\"Encender el dispositivo\", \"Observar pantalla\"],\n      \"reported_by\": \"cliente\"\n    },\n    {\n      \"title\": \"Bateria no carga\",\n      \"description\": \"La bateria no supera el 20% de carga\",\n      \"failure_code_id\": 2,\n      \"reported_by\": \"cliente\"\n    }\n  ],\n  \"customer_data\": {\n    \"customer_id\": 1,\n    \"customer_name\": \"Carlos Lopez\",\n    \"customer_email\": \"carlos@example.com\",\n    \"customer_phone\": \"+57 300 123 4567\",\n    \"customer_address\": \"Calle 123 #45-67\",\n    \"customer_city\": \"Bogota\",\n    \"customer_country\": \"Colombia\",\n    \"customer_type\": \"individual\",\n    \"preferred_contact\": \"email\"\n  },\n  \"cost_info\": {\n    \"estimated_cost\": 150000,\n    \"labor_cost\": 50000,\n    \"parts_cost\": 100000,\n    \"currency\": \"COP\"\n  },\n  \"timeline\": {\n    \"estimated_completion\": \"2026-05-30T18:00:00Z\",\n    \"estimated_hours\": 4,\n    \"sla_deadline\": \"2026-05-31T18:00:00Z\"\n  },\n  \"notes\": [\n    { \"content\": \"Cliente solicita urgencia\", \"type\": \"internal\" }\n  ]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "Crea una orden con dispositivo, fallas (issues) y notas en una sola transacción.\n\n**Campos de issue (ACTUALIZADOS):**\n- `title` (antes: issue_name)\n- `description` (antes: issue_description)\n- `failure_code_id` (antes: issue_code) — FK a FailureCode del catálogo\n- `additional_notes` (opcional)\n- `steps_to_reproduce` (opcional, array)\n- `reported_by` (opcional, default: 'customer')\n- `attachments` (opcional, array de objetos {filename, originalName, size, url})"
+                    }
+                },
+                {
+                    "name": "Get All Orders",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders/all?page=1&limit=10&filter=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders",
+                                "all"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "filter",
+                                    "value": ""
+                                }
+                            ]
+                        },
+                        "description": "Filtra por order_code, description o customer_name."
+                    }
+                },
+                {
+                    "name": "Get Order by Code",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders/:order_code",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders",
+                                ":order_code"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "order_code",
+                                    "value": "1-20260524-00001"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Order Issue",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders/issues/create",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders",
+                                "issues",
+                                "create"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"order_id\": 1,\n  \"title\": \"Microfono no funciona\",\n  \"description\": \"El microfono no capta audio durante llamadas\",\n  \"failure_code_id\": 2,\n  \"additional_notes\": \"Problema detectado en revision tecnica\",\n  \"steps_to_reproduce\": [\"Hacer llamada\", \"Hablar al microfono\"],\n  \"reported_by\": \"tecnico\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "Agrega una falla adicional a una orden existente.\n\n**Campos ACTUALIZADOS** (ya no existen: issue_name, issue_description, issue_type, issue_severity, issue_code, issue_additional_info, issue_environment, etc.)"
+                    }
+                },
+                {
+                    "name": "Assign Technician to Order",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders/assign",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders",
+                                "assign"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"orderCode\": \"1-20260524-00001\",\n  \"technicianId\": 1\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Order Services",
+            "description": "Servicios aplicados a una orden. Un OrderService resuelve N OrderIssues (fallas). Al crear, los issues indicados pasan a RESOLVED.",
+            "item": [
+                {
+                    "name": "Get All Order Services",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders-service/all?page=1&limit=10&orderId=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders-service",
+                                "all"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "orderId",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Order Service by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders-service/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders-service",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Services by Order ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders-service/order/:order_id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders-service",
+                                "order",
+                                ":order_id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "order_id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "Retorna todos los servicios de una orden con sus fallas resueltas."
+                    }
+                },
+                {
+                    "name": "Create Order Service",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders-service/create",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders-service",
+                                "create"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"order_id\": 1,\n  \"service_id\": 1,\n  \"issue_ids\": [1, 2],\n  \"price\": 150000,\n  \"estimated_minutes\": 120,\n  \"notes\": \"Incluye repuesto de pantalla original\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "Asigna un servicio a la orden y lo vincula con las fallas que resuelve.\n\n**Campos ACTUALIZADOS:**\n- `issue_ids` (antes: issues_ids) — IDs de OrderIssue que este servicio resuelve\n- `price` (antes: precio)\n- `estimated_minutes` (antes: tiempo_estimado_minutos)\n- `notes` (antes: notas)\n\nAl crear, los OrderIssue en `issue_ids` pasan automáticamente a status RESOLVED."
+                    }
+                },
+                {
+                    "name": "Update Order Service",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders-service/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders-service",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"price\": 180000,\n  \"notes\": \"Precio actualizado por repuesto adicional\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Order Service",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders-service/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders-service",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "Al eliminar, los OrderIssue vinculados vuelven a PENDING (si no están cubiertos por otro servicio)."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Services",
+            "description": "Catálogo de servicios, tipos de orden y precios. NOTA: campos renombrados a inglés en este refactoring.",
+            "item": [
+                {
+                    "name": "Get All Services (list)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Services (paginated)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/all?page=1&limit=10&filter=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "all"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "filter",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Service by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Service",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"code\": \"SVC-001\",\n  \"description\": \"Cambio de pantalla\",\n  \"base_price\": 120000,\n  \"is_active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "**Campos ACTUALIZADOS:**\n- `code` (antes: codigo)\n- `description` (antes: descripcion)\n- `base_price` (antes: precio_base)\n- `is_active` (antes: activo)"
+                    }
+                },
+                {
+                    "name": "Update Service",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"description\": \"Cambio de pantalla OLED\",\n  \"base_price\": 150000\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Service",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Available Services for Order",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/available",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "available"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"orderTypeId\": 1,\n  \"orderIssueIds\": [1, 2],\n  \"orderId\": 1\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "Retorna servicios del catálogo disponibles para una orden, filtrados por tipo de orden y fallas pendientes.\n\n**Campos ACTUALIZADOS:**\n- `orderIssueIds` (antes: orderServiceIds) — ahora recibe IDs de OrderIssue (fallas reportadas) directamente\n- `orderId` (opcional) — excluye servicios ya asignados a esa orden\n\n**Respuesta por item:**\n- `service_id`, `code`, `description`, `base_price`\n- `order_type_id`, `order_type_name`\n- `price`, `estimatedMinutes`\n- `failure_code` — objeto {id, code, name, description} o null"
+                    }
+                },
+                {
+                    "name": "Get All Order Types (list)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/order-types/list",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "order-types",
+                                "list"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Order Types (paginated)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/order-types/all?page=1&limit=10&filter=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "order-types",
+                                "all"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "filter",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Order Type by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/order-types/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "order-types",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Order Type",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/order-types",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "order-types"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"codigo\": \"OT-001\",\n  \"nombre\": \"Reparacion Express\",\n  \"descripcion\": \"Servicio con entrega en 24h\",\n  \"activo\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Update Order Type",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/order-types/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "order-types",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nombre\": \"Reparacion Express Plus\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Order Type",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/order-types/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "order-types",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Service Pricing (ServiceOrderType)",
+            "description": "Catálogo de precios: define cuánto cuesta un servicio para un tipo de orden, opcionalmente vinculado a un código de falla. ANTES se llamaba 'Service Order Types'.",
+            "item": [
+                {
+                    "name": "Get All Service Pricing (paginated)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/service-order-types/all?page=1&limit=10&serviceId=&orderTypeId=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "service-order-types",
+                                "all"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "serviceId",
+                                    "value": ""
+                                },
+                                {
+                                    "key": "orderTypeId",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Service Pricing by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/service-order-types/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "service-order-types",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Service Pricing",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/service-order-types",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "service-order-types"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"service_id\": 1,\n  \"order_type_id\": 1,\n  \"failure_code_id\": 1,\n  \"price\": 130000,\n  \"estimated_minutes\": 90,\n  \"is_active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "Define el precio de un servicio para un tipo de orden.\n\n**Campos ACTUALIZADOS:**\n- `service_id` (antes: serviceId)\n- `order_type_id` (antes: orderTypeId)\n- `failure_code_id` (antes: issueId) — FK a FailureCode, opcional. null = aplica a cualquier falla\n- `price` (antes: precio)\n- `estimated_minutes` (antes: tiempoEstimadoMinutos)\n- `is_active` (antes: activo)"
+                    }
+                },
+                {
+                    "name": "Update Service Pricing",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/service-order-types/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "service-order-types",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"price\": 145000,\n  \"estimated_minutes\": 100\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Service Pricing",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/service-order-types/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "service-order-types",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Maintenance",
+            "description": "Catálogo de fallas: categorías, códigos, severidades y acciones de reparación.",
+            "item": [
+                {
+                    "name": "Get All Failure Categories",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/maintenance/failure-categories",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "maintenance",
+                                "failure-categories"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Failure Categories (paginated)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/maintenance/failure-categories/all?page=1&limit=10&filter=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "maintenance",
+                                "failure-categories",
+                                "all"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "filter",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Failure Category",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/maintenance/failure-categories",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "maintenance",
+                                "failure-categories"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Pantalla\",\n  \"description\": \"Fallas relacionadas con la pantalla\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Update Failure Category",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/maintenance/failure-categories/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "maintenance",
+                                "failure-categories",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Pantalla y Display\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Failure Category",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/maintenance/failure-categories/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "maintenance",
+                                "failure-categories",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Failure Severities",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/maintenance/failure-severities",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "maintenance",
+                                "failure-severities"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Failure Severity",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/maintenance/failure-severities",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "maintenance",
+                                "failure-severities"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Critica\",\n  \"priority\": 1,\n  \"description\": \"Falla que impide el uso del dispositivo\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Failure Codes",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/maintenance/failure-codes",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "maintenance",
+                                "failure-codes"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Failure Codes (paginated)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/maintenance/failure-codes/all?page=1&limit=10&filter=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "maintenance",
+                                "failure-codes",
+                                "all"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "filter",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Failure Code",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/maintenance/failure-codes",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "maintenance",
+                                "failure-codes"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"code\": \"SCR-001\",\n  \"name\": \"Pantalla rota\",\n  \"description\": \"Grieta o fractura en el panel de pantalla\",\n  \"category_id\": 1,\n  \"severity_id\": 1,\n  \"device_type_id\": 1,\n  \"estimatedRepairMinutes\": 60\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "Crea un código de falla del catálogo. Este es el objeto que se referencia en OrderIssue.failure_code_id."
+                    }
+                },
+                {
+                    "name": "Get All Repair Actions",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/maintenance/repair-actions",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "maintenance",
+                                "repair-actions"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Repair Action",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/maintenance/repair-actions",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "maintenance",
+                                "repair-actions"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"failure_code_id\": 1,\n  \"name\": \"Reemplazo de pantalla\",\n  \"description\": \"Sustituir el panel LCD/OLED completo\",\n  \"estimatedMinutes\": 60,\n  \"requiresParts\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Info Devices",
+            "item": [
+                {
+                    "name": "Get All Device Types",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/info-devices/device-types",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "info-devices",
+                                "device-types"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Device Types (paginated)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/info-devices/device-types/all?page=1&limit=10&filter=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "info-devices",
+                                "device-types",
+                                "all"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "filter",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Device Type",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/info-devices/device-types",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "info-devices",
+                                "device-types"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Smartphone\",\n  \"description\": \"Telefono inteligente\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Update Device Type",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/info-devices/device-types/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "info-devices",
+                                "device-types",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Smartphone Actualizado\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Device Type",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/info-devices/device-types/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "info-devices",
+                                "device-types",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Device Brands",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/info-devices/device-brands",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "info-devices",
+                                "device-brands"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Device Brands (paginated)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/info-devices/device-brands/all?page=1&limit=10&filter=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "info-devices",
+                                "device-brands",
+                                "all"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "filter",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Device Brand",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/info-devices/device-brands",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "info-devices",
+                                "device-brands"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Apple\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Device Models",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/info-devices/device-models",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "info-devices",
+                                "device-models"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Device Models (paginated)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/info-devices/device-models/all?page=1&limit=10&filter=&brandId=&typeId=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "info-devices",
+                                "device-models",
+                                "all"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "filter",
+                                    "value": ""
+                                },
+                                {
+                                    "key": "brandId",
+                                    "value": ""
+                                },
+                                {
+                                    "key": "typeId",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Device Model",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/info-devices/device-models",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "info-devices",
+                                "device-models"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"iPhone 13\",\n  \"brand_id\": 1,\n  \"type_id\": 1\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Password Types",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/info-devices/password-types",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "info-devices",
+                                "password-types"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Password Type",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/info-devices/password-types",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "info-devices",
+                                "password-types"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"PIN\",\n  \"description\": \"Codigo numerico de 4-6 digitos\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Log Events",
+            "item": [
+                {
+                    "name": "Create Log Event",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/log-events/create",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "log-events",
+                                "create"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"order_id\": 1,\n  \"description\": \"Orden recibida en taller\",\n  \"status\": \"IN_PROGRESS\",\n  \"type\": \"STATUS_CHANGE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Get Logs by Order",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "{{tenantId}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/log-events/:order_id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "log-events",
+                                ":order_id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "order_id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Upload",
+            "description": "Subida de archivos. NO requiere TenantSelectionGuard ni header X-Tenant-ID.",
+            "item": [
+                {
+                    "name": "Upload Image",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/upload/image",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "upload",
+                                "image"
+                            ]
+                        },
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "description": "Acepta: jpg, jpeg, png, gif, webp. Máx 5MB. Retorna URL del archivo."
+                    }
+                },
+                {
+                    "name": "Upload Document",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/upload/document",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "upload",
+                                "document"
+                            ]
+                        },
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "description": "Acepta: pdf, doc, docx, xls, xlsx, txt. Máx 10MB."
+                    }
+                },
+                {
+                    "name": "Upload Multiple Files",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/upload/multiple",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "upload",
+                                "multiple"
+                            ]
+                        },
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "files",
+                                    "type": "file",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "description": "Máx 10 archivos, 5MB c/u."
+                    }
+                }
+            ]
+        }
+    ]
+}

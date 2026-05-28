@@ -108,7 +108,7 @@ export class Order {
   @OneToMany(() => LogEvents, log => log.order)
   logs: LogEvents[];
 
-  @OneToMany(() => MaterialIssueItem, item => item.order)
+  @OneToMany(() => MaterialIssueItem, item => item.destinationReference)
   material_issue_items: MaterialIssueItem[];
 
   @CreateDateColumn()

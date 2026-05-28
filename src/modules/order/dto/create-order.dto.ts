@@ -34,43 +34,35 @@ export class DeviceDataDto {
 
 export class IssueDto {
   @IsString()
-  issue_name: string;
+  title: string;
 
   @IsString()
-  issue_description: string;
+  description: string;
 
+  /** ID del código de falla del catálogo (FailureCode) */
   @IsNumber()
-  issue_type: number;
-
-  @IsNumber()
-  issue_severity: number;
-
-  @IsNumber()
-  issue_code: number;
+  @IsOptional()
+  failure_code_id?: number;
 
   @IsOptional()
   @IsString()
-  issue_additional_info?: string;
+  additional_notes?: string;
 
   @IsOptional()
   @IsArray()
-  issue_steps_to_reproduce?: string[];
+  steps_to_reproduce?: string[];
 
   @IsOptional()
   @IsString()
-  issue_environment?: string;
-
-  @IsOptional()
-  @IsString()
-  issue_additional_notes?: string;
+  reported_by?: string;
 
   @IsOptional()
   @IsArray()
-  issue_files?: {
-    filename: string,
-    originalName: string,
-    size: string,
-    url: string,
+  attachments?: {
+    filename: string;
+    originalName: string;
+    size: string;
+    url: string;
   }[];
 }
 

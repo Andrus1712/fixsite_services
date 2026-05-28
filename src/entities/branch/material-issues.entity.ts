@@ -23,7 +23,7 @@ export class MaterialIssue {
 
     @OneToMany(
         () => MaterialIssueItem,
-        item => item.issue,
+        item => item.materialIssue,
         { cascade: true },
     )
     items: MaterialIssueItem[];

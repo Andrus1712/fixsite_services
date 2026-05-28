@@ -31,7 +31,7 @@ export class MaterialIssueService {
 
         // Crear items
         const items = dto.items.map(item => itemRepo.create({
-            issue: savedIssue,
+            materialIssue: savedIssue,
             article: { id: item.article_id } as any,
             quantity: item.quantity,
             destinationReference: item.destinationReference
@@ -88,7 +88,7 @@ export class MaterialIssueService {
                 'material_issue_items.id AS id',
                 'material_issue_items.quantity AS quantity',
                 'material_issue_items.destinationReference AS destinationReference',
-                'issues.id AS issues_id',
+                'material_issues.id AS issues_id',
                 'articles.id AS article_id',
                 'articles.name AS article_name',
                 'articles.sku AS article_sku',
@@ -96,11 +96,11 @@ export class MaterialIssueService {
                 'article_categories.name AS article_category_name',
                 'article_brands.name AS article_brand_name'
             ])
-            .innerJoin('material_issue_items.issue', 'issues')
+            .innerJoin('material_issue_items.materialIssue', 'material_issues')
             .innerJoin('material_issue_items.article', 'articles')
             .innerJoin('articles.category', 'article_categories')
             .innerJoin('articles.brand', 'article_brands')
-            .where('material_issue_items.issue = :issues_id', { issues_id });
+            .where('material_issue_items.materialIssue = :issues_id', { issues_id });
 
         const receipt = await queryBuilder.getRawMany();
 
@@ -268,18 +268,18 @@ export class MaterialIssueService {
                 'articles.sku AS article_sku',
                 'articles.unit_measurement AS article_unit_measurement',
                 'article_categories.name AS article_category_name',
-                'article_brands.name AS article_brand_name'
+                'article_brands.name AS article_brand_name',
+                'order.id AS order_id'
             ])
-            .innerJoin('material_issue_items.issue', 'issues')
+            .innerJoin('material_issue_items.materialIssue', 'issues')
             .innerJoin('material_issue_items.article', 'articles')
             .innerJoin('articles.category', 'article_categories')
             .innerJoin('articles.brand', 'article_brands')
-            .innerJoin('material_issue_items.order', 'order')
+            .innerJoin('material_issue_items.destinationReference', 'order')
             .where('material_issue_items.destinationReference = :destinationReference', { destinationReference });
 
         const items = await queryBuilder.getRawMany();
-        console.log(items);
-        
+
         return items;
     }
 

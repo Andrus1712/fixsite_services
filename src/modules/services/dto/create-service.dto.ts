@@ -2,16 +2,16 @@ import { IsString, IsNumber, IsBoolean, IsOptional, Min } from 'class-validator'
 
 export class CreateServiceDto {
   @IsString()
-  codigo: string;
+  code: string;
 
   @IsString()
-  descripcion: string;
+  description: string;
 
   @IsNumber()
   @Min(0)
-  precio_base: number;
+  base_price: number;
 
   @IsBoolean()
   @IsOptional()
-  activo?: boolean;
+  is_active?: boolean;
 }

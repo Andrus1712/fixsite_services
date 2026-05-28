@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { ConnectionDatabaseService } from 'src/database/connection-database.service';
 import { Tenant } from 'src/entities/global/tenant.entity';
 import { Service } from '../../entities/branch/service.entity';
@@ -14,7 +14,7 @@ import { UpdateServiceOrderTypeDto } from './dto/update-service-order-type.dto';
 
 @Injectable()
 export class ServicesService {
-  constructor(private readonly tenantAwareService: ConnectionDatabaseService) {}
+  constructor(private readonly tenantAwareService: ConnectionDatabaseService) { }
 
   // ── Services ──────────────────────────────────────────────────────────────
 
@@ -23,7 +23,7 @@ export class ServicesService {
     const qb = repo.createQueryBuilder('service');
 
     if (filter) {
-      qb.where('service.codigo LIKE :f OR service.descripcion LIKE :f', { f: `%${filter}%` });
+      qb.where('service.code LIKE :f OR service.description LIKE :f', { f: `%${filter}%` });
     }
 
     const [data, total] = await qb.skip((page - 1) * limit).take(limit).getManyAndCount();
@@ -38,12 +38,21 @@ export class ServicesService {
 
   async findOneService(tenant: Tenant, id: number) {
     const repo = await this.tenantAwareService.getRepository(Service, tenant);
-    return repo.findOne({ where: { id } });
+    const service = await repo.findOne({ where: { id } });
+    if (!service) throw new NotFoundException(`Service with ID ${id} not found`);
+    return service;
   }
 
   async createService(tenant: Tenant, dto: CreateServiceDto) {
     const repo = await this.tenantAwareService.getRepository(Service, tenant);
-    return repo.save(repo.create(dto));
+    try {
+      return await repo.save(repo.create(dto));
+    } catch (error) {
+      if (error?.code === '23505') {
+        throw new ConflictException(`Ya existe un servicio con el código '${dto.code}'`);
+      }
+      throw error;
+    }
   }
 
   async updateService(tenant: Tenant, id: number, dto: UpdateServiceDto) {
@@ -79,12 +88,21 @@ export class ServicesService {
 
   async findOneOrderType(tenant: Tenant, id: number) {
     const repo = await this.tenantAwareService.getRepository(OrderType, tenant);
-    return repo.findOne({ where: { id } });
+    const orderType = await repo.findOne({ where: { id } });
+    if (!orderType) throw new NotFoundException(`OrderType with ID ${id} not found`);
+    return orderType;
   }
 
   async createOrderType(tenant: Tenant, dto: CreateOrderTypeDto) {
     const repo = await this.tenantAwareService.getRepository(OrderType, tenant);
-    return repo.save(repo.create(dto));
+    try {
+      return await repo.save(repo.create(dto));
+    } catch (error) {
+      if (error?.code === '23505') {
+        throw new ConflictException(`Ya existe un tipo de orden con ese código`);
+      }
+      throw error;
+    }
   }
 
   async updateOrderType(tenant: Tenant, id: number, dto: UpdateOrderTypeDto) {
@@ -98,14 +116,20 @@ export class ServicesService {
     await repo.delete(id);
   }
 
-  // ── Service Order Types ───────────────────────────────────────────────────
+  // ── Service Order Types (catálogo de precios) ─────────────────────────────
 
-  async getAllServiceOrderTypes(tenant: Tenant, page = 1, limit = 10, serviceId?: number, orderTypeId?: number) {
+  async getAllServiceOrderTypes(
+    tenant: Tenant,
+    page = 1,
+    limit = 10,
+    serviceId?: number,
+    orderTypeId?: number,
+  ) {
     const repo = await this.tenantAwareService.getRepository(ServiceOrderType, tenant);
     const qb = repo.createQueryBuilder('sot')
       .leftJoinAndSelect('sot.service', 'service')
       .leftJoinAndSelect('sot.orderType', 'orderType')
-      .leftJoinAndSelect('sot.issue', 'issue');
+      .leftJoinAndSelect('sot.failureCode', 'failureCode');
 
     if (serviceId) qb.andWhere('sot.service_id = :serviceId', { serviceId });
     if (orderTypeId) qb.andWhere('sot.order_type_id = :orderTypeId', { orderTypeId });
@@ -116,18 +140,18 @@ export class ServicesService {
 
   async findOneServiceOrderType(tenant: Tenant, id: number) {
     const repo = await this.tenantAwareService.getRepository(ServiceOrderType, tenant);
-    return repo.findOne({ where: { id }, relations: ['service', 'orderType', 'issue'] });
+    return repo.findOne({ where: { id }, relations: ['service', 'orderType', 'failureCode'] });
   }
 
   async createServiceOrderType(tenant: Tenant, dto: CreateServiceOrderTypeDto) {
     const repo = await this.tenantAwareService.getRepository(ServiceOrderType, tenant);
     const entity = repo.create({
-      service: { id: dto.serviceId } as any,
-      orderType: { id: dto.orderTypeId } as any,
-      issue: dto.issueId ? ({ id: dto.issueId } as any) : null,
-      precio: dto.precio,
-      tiempoEstimadoMinutos: dto.tiempoEstimadoMinutos,
-      activo: dto.activo ?? true,
+      service: { id: dto.service_id } as any,
+      orderType: { id: dto.order_type_id } as any,
+      failureCode: dto.failure_code_id ? ({ id: dto.failure_code_id } as any) : null,
+      price: dto.price,
+      estimatedMinutes: dto.estimated_minutes,
+      is_active: dto.is_active ?? true,
     });
     return repo.save(entity);
   }
@@ -135,9 +159,9 @@ export class ServicesService {
   async updateServiceOrderType(tenant: Tenant, id: number, dto: UpdateServiceOrderTypeDto) {
     const repo = await this.tenantAwareService.getRepository(ServiceOrderType, tenant);
     const update: any = { ...dto };
-    if (dto.serviceId) { update.service = { id: dto.serviceId }; delete update.serviceId; }
-    if (dto.orderTypeId) { update.orderType = { id: dto.orderTypeId }; delete update.orderTypeId; }
-    if (dto.issueId) { update.issue = { id: dto.issueId }; delete update.issueId; }
+    if (dto.service_id !== undefined) { update.service = { id: dto.service_id }; delete update.service_id; }
+    if (dto.order_type_id !== undefined) { update.orderType = { id: dto.order_type_id }; delete update.order_type_id; }
+    if (dto.failure_code_id !== undefined) { update.failureCode = { id: dto.failure_code_id }; delete update.failure_code_id; }
     await repo.save({ id, ...update });
     return this.findOneServiceOrderType(tenant, id);
   }
@@ -147,49 +171,54 @@ export class ServicesService {
     await repo.delete(id);
   }
 
-  // ── Available Services by OrderType + Issues ──────────────────────────────
+  // ── Available Services by OrderType + FailureCodes ────────────────────────
 
+  /**
+   * Devuelve los servicios disponibles para una orden según su tipo y las fallas
+   * pendientes (no cubiertas aún por un OrderService existente).
+   *
+   * @param orderTypeId  - Tipo de orden
+   * @param orderIssueIds - IDs de OrderIssue pendientes (fallas reportadas)
+   * @param orderId      - ID de la orden (para excluir servicios ya asignados)
+   */
   async findAvailableServices(
     tenant: Tenant,
     orderTypeId: number,
-    orderServiceIds: number[], // IDs de orders_service (no de orders_issues)
+    orderIssueIds: number[],
     orderId?: number,
   ) {
     const connection = await this.tenantAwareService.getConnection(tenant);
     const sotRepo = connection.getRepository(ServiceOrderType);
     const orderServiceRepo = connection.getRepository(OrderService);
 
-    // Resolver los failure_code IDs a partir de los IDs de orders_service
-    // orders_service → order_service_issues (join table) → orders_issues.issue_code (FK a failure_codes)
+    // Resolver los failure_code_id a partir de los IDs de OrderIssue
     let failureCodeIds: number[] = [];
 
-    if (orderServiceIds?.length) {
-      // Obtener los failure_code IDs (issue_code es la FK en orders_issues hacia failure_codes)
-      const rows: { issue_code: number }[] = await orderServiceRepo
-        .createQueryBuilder('os')
-        .innerJoin('order_service_issues', 'osi', 'osi.order_service_id = os.id')
-        .innerJoin('orders_issues', 'oi', 'oi.id = osi.order_issue_id')
-        .select('oi.issue_code', 'issue_code')
-        .where('os.id NOT IN (:...orderServiceIds)', { orderServiceIds })
-        .andWhere('oi.issue_code IS NOT NULL')
+    if (orderIssueIds?.length) {
+      const rows: { failure_code_id: number }[] = await connection
+        .getRepository('order_issues')
+        .createQueryBuilder('oi')
+        .select('oi.failure_code_id', 'failure_code_id')
+        .where('oi.id IN (:...orderIssueIds)', { orderIssueIds })
+        .andWhere('oi.failure_code_id IS NOT NULL')
         .distinct(true)
         .getRawMany();
 
-      failureCodeIds = rows.map(r => r.issue_code).filter(id => id != null);
+      failureCodeIds = rows.map(r => r.failure_code_id).filter(id => id != null);
     }
 
     const qb = sotRepo.createQueryBuilder('sot')
       .leftJoinAndSelect('sot.service', 'service')
       .leftJoinAndSelect('sot.orderType', 'orderType')
-      .leftJoinAndSelect('sot.issue', 'issue')
+      .leftJoinAndSelect('sot.failureCode', 'failureCode')
       .where('sot.order_type_id = :orderTypeId', { orderTypeId })
-      .andWhere('sot.activo = true')
-      .andWhere('service.activo = true');
+      .andWhere('sot.is_active = true')
+      .andWhere('service.is_active = true');
 
     if (failureCodeIds.length) {
-      qb.andWhere('sot.issue_id IN (:...failureCodeIds)', { failureCodeIds });
+      qb.andWhere('sot.failure_code_id IN (:...failureCodeIds)', { failureCodeIds });
     } else {
-      qb.andWhere('sot.issue_id IS NULL');
+      qb.andWhere('sot.failure_code_id IS NULL');
     }
 
     if (orderId) {
@@ -202,6 +231,6 @@ export class ServicesService {
         .setParameter('orderId', orderId);
     }
 
-    return qb.orderBy('service.descripcion', 'ASC').getMany();
+    return qb.orderBy('service.description', 'ASC').getMany();
   }
 }

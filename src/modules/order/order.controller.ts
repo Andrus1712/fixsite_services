@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Get, HttpStatus, Param, Query, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, HttpStatus, Param, Query, UseInterceptors, Put } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateOrderIssueDto } from './dto/create-order-issue.dto';
@@ -10,8 +10,6 @@ import { OrderResponseDto, IssueResponseDto } from './dto/order-response.dto';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { SerializeInterceptor } from 'src/common/interceptors/serialize.interceptor';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { LogStatus, LogType } from 'src/entities/branch/log-events.entity';
-import { LogEventService } from '../log-events/logs-events.service';
 import { AssignTechnicianOrderDto } from '../technician/dto/assign-technician-order.dto';
 
 @Controller('orders')
@@ -19,7 +17,6 @@ import { AssignTechnicianOrderDto } from '../technician/dto/assign-technician-or
 export class OrderController {
   constructor(
     private readonly orderService: OrderService,
-    private readonly logEventService: LogEventService
   ) { }
 
   @UseInterceptors(new SerializeInterceptor(OrderResponseDto, { excludeExtraneousValues: true }))
@@ -87,9 +84,10 @@ export class OrderController {
   @Post('/issues/create')
   async createIssue(
     @CurrentTenant() tenant: Tenant,
+    @CurrentUser() user: any,
     @Body() dto: CreateOrderIssueDto,
   ) {
-    const data = await this.orderService.createIssue(tenant, dto);
+    const data = await this.orderService.createIssue(tenant, dto, user.username);
     return {
       success: true,
       status: HttpStatus.CREATED,
@@ -110,6 +108,25 @@ export class OrderController {
       success: true,
       status: HttpStatus.OK,
       message: "Orden asignada correctamente",
+      data,
+      errors: null
+    };
+  }
+
+  @Put('/update-status/:order_code')
+  async updateOrderStatus(
+    @CurrentTenant() tenant: Tenant,
+    @CurrentUser() user: any,
+    @Param('order_code') orderCode: string,
+    @Body('status') status: number,
+    @Body('notes') notes?: string,
+  ) {
+    const data = await this.orderService.updateOrderStatus(tenant, orderCode, status, user.username, notes);
+
+    return {
+      success: true,
+      status: HttpStatus.OK,
+      message: "Estado de orden actualizado correctamente",
       data,
       errors: null
     };

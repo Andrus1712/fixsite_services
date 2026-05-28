@@ -1,124 +1,48 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Order } from './order.entity';
 import { FailureCode } from './failure-codes.entity';
 
-
-export enum OrderIssuesStatus {
+export enum OrderIssueStatus {
   PENDING = 'PENDING',
   RESOLVED = 'RESOLVED',
   REJECTED = 'REJECTED',
 }
 
-
-@Entity('orders_issues')
+@Entity('order_issues')
 export class OrderIssue {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  issue_name: string;
+  title: string;
 
   @Column('text')
-  issue_description: string;
-
-  @Column()
-  issue_type: number;
-
-  @Column()
-  issue_type_description: string;
-
-  @Column()
-  issue_severity: number;
-
-  @Column()
-  issue_severity_description: string;
-
-  @Column()
-  issue_reproducibility: number;
-
-  @Column()
-  issue_reproducibility_description: string;
-
-  @Column()
-  issue_frequency: number;
-
-  @Column()
-  issue_frequency_description: string;
-
-  @Column()
-  issue_impact: number;
-
-  @Column()
-  issue_impact_description: string;
-
-  @Column()
-  issue_difficulty: number;
-
-  @Column()
-  issue_difficulty_description: string;
-
-  @Column()
-  issue_priority: number;
-
-  @Column()
-  issue_priority_description: string;
-
-  @Column()
-  issue_urgency: number;
-
-  @Column()
-  issue_urgency_description: string;
-
-  @Column()
-  issue_detection: number;
-
-  @Column()
-  issue_detection_description: string;
-
-  @Column()
-  issue_reported_by: string;
-
-  @Column({ type: 'date' })
-  issue_reported_date: Date;
-
-  @Column()
-  issue_reported_time: string;
+  description: string;
 
   @Column('text', { nullable: true })
-  issue_additional_info: string;
+  additional_notes: string;
 
   @Column('json', { nullable: true })
-  issue_screenshots: string[];
+  attachments: string[];
 
   @Column('json', { nullable: true })
-  issue_videos: string[];
+  steps_to_reproduce: string[];
 
-  @Column('json', { nullable: true })
-  issue_logs: string[];
+  @Column({ nullable: true })
+  reported_by: string;
 
-  @Column('json', { nullable: true })
-  issue_attachments: string[];
+  @Column({ type: 'date', nullable: true })
+  reported_date: Date;
 
-  @Column('json', { nullable: true })
-  issue_steps_to_reproduce: string[];
-
-  @Column('json', { nullable: true })
-  issue_files: string[];
-
-  @Column('text', { nullable: true })
-  issue_environment: string;
-
-  @Column('text', { nullable: true })
-  issue_additional_notes: string;
-
-  @Column('json', { nullable: true })
-  issue_tags: string[];
-
-  @Column('json', { nullable: true })
-  issue_custom_fields: object;
-
-  @Column('json', { nullable: true })
-  issue_related_orders: string[];
+  // ── Relación con la orden ─────────────────────────────────────────────────
 
   @Column()
   order_id: number;
@@ -127,15 +51,22 @@ export class OrderIssue {
   @JoinColumn({ name: 'order_id' })
   order: Order;
 
-  @ManyToOne(() => FailureCode, failture => failture.id)
-  @JoinColumn({ name: 'issue_code' })
-  issue_code: FailureCode;
+  // ── Clasificación mediante FailureCode ────────────────────────────────────
+
+  @Column({ nullable: true })
+  failure_code_id: number;
+
+  @ManyToOne(() => FailureCode, { nullable: true, eager: false })
+  @JoinColumn({ name: 'failure_code_id' })
+  failureCode: FailureCode;
+
+  // ── Estado ────────────────────────────────────────────────────────────────
 
   @Column({ type: 'bool', default: false })
   is_resolved: boolean;
 
-  @Column({ type: 'enum', enum: OrderIssuesStatus, default: OrderIssuesStatus.PENDING })
-  status: OrderIssuesStatus;
+  @Column({ type: 'enum', enum: OrderIssueStatus, default: OrderIssueStatus.PENDING })
+  status: OrderIssueStatus;
 
   @CreateDateColumn()
   createdAt: Date;

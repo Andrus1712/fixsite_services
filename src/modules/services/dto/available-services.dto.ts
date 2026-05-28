@@ -5,10 +5,11 @@ export class AvailableServicesDto {
   @IsNumber()
   orderTypeId: number;
 
+  /** IDs de OrderIssue (fallas reportadas) pendientes de resolver */
   @IsArray()
   @IsOptional()
   @Type(() => Number)
-  orderServiceIds?: number[]; // IDs de orders_service, se resuelven a failure_code IDs internamente
+  orderIssueIds?: number[];
 
   @IsNumber()
   @IsOptional()

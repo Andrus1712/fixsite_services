@@ -2,15 +2,29 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGenerat
 import { Order } from "./order.entity";
 
 export enum LogType {
-    CREATED = "created",
-    UPDATED = "updated",
-    ASSIGNED = "assigned",
-    STATUS_CHANGE = "status_change",
+    // Orden
+    ORDER_CREATED = "order_created",
+    ORDER_UPDATED = "order_updated",
+    ORDER_STATUS_CHANGE = "order_status_change",
+    ORDER_ASSIGNED = "order_assigned",
+    ORDER_COMPLETED = "order_completed",
+    ORDER_CANCELLED = "order_cancelled",
+    // Issues (fallas)
+    ISSUE_ADDED = "issue_added",
+    ISSUE_RESOLVED = "issue_resolved",
+    ISSUE_REJECTED = "issue_rejected",
+    ISSUE_REOPENED = "issue_reopened",
+    // Servicios
+    SERVICE_ADDED = "service_added",
+    SERVICE_UPDATED = "service_updated",
+    SERVICE_REMOVED = "service_removed",
+    // Notas
+    NOTE_ADDED = "note_added",
+    // Dispositivos
+    DEVICE_ADDED = "device_added",
+    // Genérico
     COMMENT = "comment",
-    REPAIR = "repair",
-    COMPLETED = "completed",
-    CANCELLED = "cancelled",
-    CUSTOM = "custom"
+    CUSTOM = "custom",
 }
 
 export enum LogStatus {
@@ -20,6 +34,7 @@ export enum LogStatus {
     INFO = "info",
     DEFAULT = "default"
 }
+
 @Entity('logs_events')
 export class LogEvents {
     @PrimaryGeneratedColumn('increment')
@@ -58,13 +73,16 @@ export class LogEvents {
     @Column({ nullable: true })
     icon?: string;
 
+    @Column({ nullable: true })
+    order_id?: number;
+
     @CreateDateColumn()
     createdAt: Date;
 
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToOne(() => Order, order => order.id, { onDelete: 'SET NULL' })
+    @ManyToOne(() => Order, order => order.logs, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'order_id' })
     order?: Order;
 }

@@ -153,129 +153,57 @@ export class IssueResponseDto {
     id: number;
 
     @Expose()
-    issue_name: string;
+    title: string;
 
     @Expose()
-    issue_description: string;
+    description: string;
 
     @Expose()
-    issue_type: number;
+    additional_notes: string;
 
     @Expose()
-    issue_type_description: string;
+    attachments: string[];
 
     @Expose()
-    issue_severity: number;
+    steps_to_reproduce: string[];
 
     @Expose()
-    issue_severity_description: string;
+    reported_by: string;
 
     @Expose()
-    issue_reproducibility: number;
+    reported_date: string;
+
+    // ── Clasificación (desde FailureCode) ─────────────────────────────────
 
     @Expose()
-    issue_reproducibility_description: string;
+    @Transform(({ obj }) => obj.failureCode?.id ?? null)
+    failure_code_id: number;
 
     @Expose()
-    issue_frequency: number;
+    @Transform(({ obj }) => obj.failureCode?.code ?? null)
+    failure_code: string;
 
     @Expose()
-    issue_frequency_description: string;
+    @Transform(({ obj }) => obj.failureCode?.name ?? null)
+    failure_code_name: string;
 
     @Expose()
-    issue_impact: number;
+    @Transform(({ obj }) => obj.failureCode?.description ?? null)
+    failure_code_description: string;
 
     @Expose()
-    issue_impact_description: string;
+    @Transform(({ obj }) => obj.failureCode?.severity?.name ?? null)
+    severity: string;
 
     @Expose()
-    issue_difficulty: number;
+    @Transform(({ obj }) => obj.failureCode?.category?.name ?? null)
+    category: string;
 
     @Expose()
-    issue_difficulty_description: string;
+    @Transform(({ obj }) => obj.failureCode?.deviceType?.name ?? null)
+    device_type: string;
 
-    @Expose()
-    issue_priority: number;
-
-    @Expose()
-    issue_priority_description: string;
-
-    @Expose()
-    issue_urgency: number;
-
-    @Expose()
-    issue_urgency_description: string;
-
-    @Expose()
-    issue_detection: number;
-
-    @Expose()
-    issue_detection_description: string;
-
-    @Expose()
-    issue_reported_by: string;
-
-    @Expose()
-    issue_reported_date: string;
-
-    @Expose()
-    issue_reported_time: string;
-
-    @Expose()
-    issue_additional_info: string;
-
-    @Expose()
-    @Transform(({ obj }) => obj.issue_files.map((file: any) => file.url))
-    issue_files: string[];
-
-    @Expose()
-    issue_attachments: string[];
-
-    @Expose()
-    issue_steps_to_reproduce: string[];
-
-    @Expose()
-    issue_environment: string;
-
-    @Expose()
-    issue_additional_notes: string;
-
-    @Expose()
-    issue_tags: string[];
-
-    @Expose()
-    issue_custom_fields: Record<string, any>;
-
-    @Expose()
-    issue_related_orders: string[];
-
-    @Expose()
-    @Transform(({ obj }) => obj.issue_code?.code)
-    failure_codes_code: string;
-
-    @Expose()
-    @Transform(({ obj }) => obj.issue_code?.name)
-    failure_codes_name: string;
-
-    @Expose()
-    @Transform(({ obj }) => obj.issue_code?.description)
-    failure_codes_description: string;
-    
-    @Expose()
-    @Transform(({ obj }) => obj.issue_code?.id)
-    failure_codes_id: number;
-
-    @Expose()
-    @Transform(({ obj }) => obj.issue_code?.severity?.name)
-    failure_severities_name: string;
-
-    @Expose()
-    @Transform(({ obj }) => obj.issue_code?.category?.name)
-    failure_categories_name: string;
-
-    @Expose()
-    @Transform(({ obj }) => obj.issue_code?.deviceType?.name)
-    device_types_name: string;
+    // ── Estado ────────────────────────────────────────────────────────────
 
     @Expose()
     status: string;

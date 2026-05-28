@@ -2,24 +2,25 @@ import { IsNumber, IsBoolean, IsOptional, Min } from 'class-validator';
 
 export class CreateServiceOrderTypeDto {
   @IsNumber()
-  serviceId: number;
+  service_id: number;
 
   @IsNumber()
-  orderTypeId: number;
+  order_type_id: number;
 
+  /** ID del FailureCode al que aplica este precio (opcional) */
   @IsNumber()
   @IsOptional()
-  issueId?: number;
+  failure_code_id?: number;
 
   @IsNumber()
   @Min(0)
-  precio: number;
+  price: number;
 
   @IsNumber()
   @Min(0)
-  tiempoEstimadoMinutos: number;
+  estimated_minutes: number;
 
   @IsBoolean()
   @IsOptional()
-  activo?: boolean;
+  is_active?: boolean;
 }

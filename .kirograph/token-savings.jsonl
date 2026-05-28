@@ -1,0 +1,39 @@
+{"timestamp":1779334845473,"command":"kirograph_context","originalTokens":15000,"compressedTokens":585,"strategy":"graph:kirograph_context","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779334852020,"command":"kirograph_search","originalTokens":3300,"compressedTokens":36,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779334857383,"command":"kirograph_search","originalTokens":3300,"compressedTokens":36,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779337434598,"command":"kirograph_context","originalTokens":15000,"compressedTokens":663,"strategy":"graph:kirograph_context","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779337474202,"command":"kirograph_search","originalTokens":3300,"compressedTokens":31,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779337476596,"command":"kirograph_node","originalTokens":1500,"compressedTokens":53,"strategy":"graph:kirograph_node","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779575643811,"command":"kirograph_context","originalTokens":15000,"compressedTokens":733,"strategy":"graph:kirograph_context","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779577386406,"command":"cd /Users/desarrollo/proyectos/nestjs/fixsite_services && npx tsc --noEmit 2>&1","originalTokens":91,"compressedTokens":29,"strategy":"tsc:grouped","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779582980860,"command":"npx tsc --noEmit 2>&1","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779644240743,"command":"kirograph_search","originalTokens":3300,"compressedTokens":1041,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779644260017,"command":"kirograph_search","originalTokens":3300,"compressedTokens":37,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779644260467,"command":"kirograph_search","originalTokens":3300,"compressedTokens":57,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779644260852,"command":"kirograph_search","originalTokens":3300,"compressedTokens":54,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779644261366,"command":"kirograph_search","originalTokens":3300,"compressedTokens":54,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779644261803,"command":"kirograph_search","originalTokens":3300,"compressedTokens":63,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779644262226,"command":"kirograph_search","originalTokens":3300,"compressedTokens":54,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779644262634,"command":"kirograph_search","originalTokens":3300,"compressedTokens":29,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779644263022,"command":"kirograph_search","originalTokens":3300,"compressedTokens":32,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779646975284,"command":"node --version","originalTokens":3,"compressedTokens":3,"strategy":"generic:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779646979766,"command":"npm list @nestjs/typeorm typeorm @nestjs/core --depth=0","originalTokens":38,"compressedTokens":38,"strategy":"npm-list:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779646982203,"command":"node -e \"console.log(typeof crypto, typeof crypto.randomUUID)\"","originalTokens":4,"compressedTokens":4,"strategy":"generic:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647001695,"command":"rm -rf dist tsconfig.tsbuildinfo","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647009046,"command":"npm run build 2>&1","originalTokens":13,"compressedTokens":13,"strategy":"generic:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647066678,"command":"which node && node --version","originalTokens":16,"compressedTokens":16,"strategy":"generic:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647069200,"command":"nvm list","originalTokens":8,"compressedTokens":8,"strategy":"generic:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647071508,"command":"ls ~/.nvm/versions/node/","originalTokens":5,"compressedTokens":5,"strategy":"ls:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647075781,"command":"cat ~/.nvm/alias/default","originalTokens":1,"compressedTokens":1,"strategy":"generic:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647078540,"command":"cat /Users/desarrollo/proyectos/nestjs/fixsite_services/.nvmrc 2>/dev/null || echo \"no .nvmrc\"","originalTokens":3,"compressedTokens":3,"strategy":"generic:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647081439,"command":"head -5 /Users/desarrollo/.nvm/versions/node/v20.18.0/bin/node && /Users/desarrollo/.nvm/versions/node/v20.18.0/bin/node -e \"console.log(typeof crypto)\"","originalTokens":4185,"compressedTokens":4185,"strategy":"generic:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647083883,"command":"/Users/desarrollo/.nvm/versions/node/v20.18.0/bin/node -e \"console.log(typeof crypto)\"","originalTokens":2,"compressedTokens":2,"strategy":"generic:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647100494,"command":"cat nest-cli.json","originalTokens":43,"compressedTokens":43,"strategy":"generic:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647103955,"command":"node -e \"const m = require('./node_modules/@nestjs/typeorm/dist/common/typeorm.utils.js'); console.log('ok')\"","originalTokens":1,"compressedTokens":1,"strategy":"generic:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647124541,"command":"rm -rf dist tsconfig.tsbuildinfo && npm run build 2>&1","originalTokens":13,"compressedTokens":13,"strategy":"generic:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647614120,"command":"npm list @nestjs/typeorm","originalTokens":27,"compressedTokens":27,"strategy":"npm-list:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779647618212,"command":"npm view @nestjs/typeorm time --json 2>/dev/null | grep -E '\"10\\.|\"11\\.' | tail -20","originalTokens":50,"compressedTokens":50,"strategy":"grep:short","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779659730399,"command":"kirograph_context","originalTokens":15000,"compressedTokens":606,"strategy":"graph:kirograph_context","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779660001488,"command":"npx tsc --noEmit 2>&1 | head -50","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1779849201769,"command":"kirograph_files","originalTokens":2000,"compressedTokens":6,"strategy":"graph:kirograph_files","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1779849201827,"command":"kirograph_architecture","originalTokens":7500,"compressedTokens":263,"strategy":"graph:kirograph_architecture","sessionId":"f4a78c5ac3d2d06a","source":"graph"}

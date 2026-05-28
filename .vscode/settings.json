@@ -2,5 +2,5 @@
     "exportall.config.relExclusion": [
         "/src/entities/branch/index.ts"
     ],
-    "kiroAgent.configureMCP": "Disabled"
+    "kiroAgent.configureMCP": "Enabled"
 }

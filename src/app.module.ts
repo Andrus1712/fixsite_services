@@ -118,6 +118,7 @@ export class AppModule implements NestModule {
         'maintenance/*path',
         'orders/*path',
         'customers',
+        'customers/*path',
         'log-events/*path',
         'technicians/*path',
         'article-brands/*path',
@@ -131,6 +132,7 @@ export class AppModule implements NestModule {
         'material-issues/*path',
         'purchase-orders/*path',
         'stock-transfers/*path',
+        'services',
         'services/*path',
         'orders-service/*path',
       );

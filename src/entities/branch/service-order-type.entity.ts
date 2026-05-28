@@ -1,4 +1,12 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Service } from './service.entity';
 import { OrderType } from './order-type.entity';
 import { FailureCode } from './failure-codes.entity';
@@ -17,17 +25,17 @@ export class ServiceOrderType {
   orderType: OrderType;
 
   @ManyToOne(() => FailureCode, { nullable: true })
-  @JoinColumn({ name: 'issue_id' })
-  issue: FailureCode;
+  @JoinColumn({ name: 'failure_code_id' })
+  failureCode: FailureCode;
 
   @Column('decimal', { precision: 10, scale: 2 })
-  precio: number;
+  price: number;
 
-  @Column({ name: 'tiempo_estimado_minutos' })
-  tiempoEstimadoMinutos: number;
+  @Column({ name: 'estimated_minutes' })
+  estimatedMinutes: number;
 
   @Column({ default: true })
-  activo: boolean;
+  is_active: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

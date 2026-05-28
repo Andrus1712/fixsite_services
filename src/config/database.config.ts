@@ -11,6 +11,8 @@ export const globalDatabaseConfig = registerAs(
     username: process.env.GLOBAL_DB_USERNAME,
     password: process.env.GLOBAL_DB_PASSWORD,
     database: process.env.GLOBAL_DB_DATABASE,
+    schema: process.env.GLOBAL_DB_SCHEMA || 'public',
+    ssl: process.env.GLOBAL_DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     entities: [__dirname + '/../entities/global/*.entity{.ts,.js}'],
     synchronize: process.env.GLOBAL_DB_SYNCHRONIZE === 'true',
     logging: process.env.GLOBAL_DB_LOGGING === 'true',

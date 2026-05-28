@@ -9,7 +9,7 @@ export class MaterialIssueItem {
     id: number;
 
     @ManyToOne(() => MaterialIssue, issue => issue.items)
-    issue: MaterialIssue;
+    materialIssue: MaterialIssue;
 
     @ManyToOne(() => Article)
     article: Article;
@@ -17,9 +17,6 @@ export class MaterialIssueItem {
     @Column('int')
     quantity: number;
 
-    @Column({ nullable: true })
-    destinationReference: string; // service_order, disposal, transfer
-
     @ManyToOne(() => Order, order => order.material_issue_items, { nullable: true })
-    order: Order;
+    destinationReference: string; // service_order, disposal, transfer
 }

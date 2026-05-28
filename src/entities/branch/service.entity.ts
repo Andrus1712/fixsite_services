@@ -6,17 +6,17 @@ export class Service {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
-  codigo: string;
+  @Column({ unique: true, nullable: true })
+  code: string;
 
   @Column()
-  descripcion: string;
+  description: string;
 
   @Column('decimal', { precision: 10, scale: 2 })
-  precio_base: number;
+  base_price: number;
 
   @Column({ default: true })
-  activo: boolean;
+  is_active: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -72,13 +72,13 @@ src/
     ├── customer/         # CRUD clientes
     ├── global/           # tenant/, user/, permission/ (DB global)
     ├── info-devices/     # Marcas, modelos y tipos de dispositivos
-    ├── inventory/        # Módulo compuesto (ver detalle abajo)
+    ├── inventory/        # Módulo compuesto (ver inventory-domain.md)
     ├── log-events/       # Registro de eventos por orden
-    ├── maintenance/      # failure-categories, failure-codes, failure-severities
-    ├── order/            # Órdenes de servicio
-    ├── order-service/    # Servicios asociados a una orden
+    ├── maintenance/      # failure-categories, failure-codes, failure-severities, repair-actions
+    ├── order/            # Órdenes de servicio + creación de OrderIssue
+    ├── order-service/    # Servicios aplicados a una orden (resuelven fallas)
     ├── realtime/         # WebSocket gateway + notificaciones + chat
-    ├── services/         # Catálogo de servicios ofrecidos
+    ├── services/         # Catálogo: Service, OrderType, ServiceOrderType (precios)
     ├── technician/       # CRUD técnicos
     └── upload/           # Subida de archivos (Multer, sin guard de tenant)
 ```
@@ -144,13 +144,14 @@ await this.realtimeService.emitStats(tenantId);
 
 ## Entidades Branch (DB por tenant)
 
-- **Órdenes**: `Order`, `OrderService`, `OrderStatus`, `OrderType`, `StatusHistory`, `Note`, `LogEvents`
+- **Órdenes**: `Order`, `OrderIssue`, `OrderService`, `OrderType`, `OrderStatus`, `StatusHistory`, `Note`, `LogEvents`
 - **Inventario**: `Inventory`, `Movement`, `MaterialReceipt`, `MaterialReceiptItem`, `MaterialIssue`, `MaterialIssueItem`, `StockTransfer`, `StockTransferItem`, `InventoryAdjustment`, `InventoryAdjustmentItem`, `PurchaseOrder`, `PurchaseOrderDetail`
-- **Catálogo**: `Article`, `ArticleCategory`, `ArticleBrand`, `Provider`, `Store`, `Service`, `ServiceOrderType`
+- **Catálogo de servicios**: `Service`, `ServiceOrderType` (precios por tipo de orden + falla)
+- **Catálogo de artículos**: `Article`, `ArticleCategory`, `ArticleBrand`, `Provider`, `Store`
 - **Clientes/Técnicos**: `Customer`, `Technician`
 - **Dispositivos**: `Device`, `DeviceBrand`, `DeviceModel`, `DeviceType`, `PasswordType`
-- **Mantenimiento**: `FailureCategory`, `FailureCode`, `FailureSeverity`, `RepairAction`
-- **Otros**: `Issue`, `Part`, `Product`
+- **Mantenimiento (catálogo de fallas)**: `FailureCategory`, `FailureCode`, `FailureSeverity`, `RepairAction`
+- **Otros**: `Part`, `Product`
 
 ---
 

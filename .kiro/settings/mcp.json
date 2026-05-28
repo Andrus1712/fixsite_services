@@ -1,0 +1,54 @@
+{
+  "mcpServers": {
+    "kirograph": {
+      "command": "kirograph",
+      "args": [
+        "serve",
+        "--mcp"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "kirograph_search",
+        "kirograph_context",
+        "kirograph_callers",
+        "kirograph_callees",
+        "kirograph_impact",
+        "kirograph_node",
+        "kirograph_status",
+        "kirograph_files",
+        "kirograph_dead_code",
+        "kirograph_circular_deps",
+        "kirograph_path",
+        "kirograph_architecture",
+        "kirograph_coupling",
+        "kirograph_package",
+        "kirograph_hotspots",
+        "kirograph_surprising",
+        "kirograph_diff",
+        "kirograph_type_hierarchy",
+        "kirograph_exec",
+        "kirograph_gain"
+      ]
+    },
+    "postgres-global": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres.ekeazwpzwzrtvykhoyzb:b3kjGsHFfKkUkauJ@aws-1-us-east-2.pooler.supabase.com:6543/fixsite_global"
+      ],
+      "disabled": false,
+      "autoApprove": []
+    },
+    "postgres-tenant": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres.ekeazwpzwzrtvykhoyzb:b3kjGsHFfKkUkauJ@aws-1-us-east-2.pooler.supabase.com:6543/fixsite_comercial1"
+      ],
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
