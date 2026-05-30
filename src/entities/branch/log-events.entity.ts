@@ -7,6 +7,7 @@ export enum LogType {
     ORDER_UPDATED = "order_updated",
     ORDER_STATUS_CHANGE = "order_status_change",
     ORDER_ASSIGNED = "order_assigned",
+    ORDER_UNASSIGNED = "order_unassigned",
     ORDER_COMPLETED = "order_completed",
     ORDER_CANCELLED = "order_cancelled",
     // Issues (fallas)

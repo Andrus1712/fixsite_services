@@ -26,6 +26,7 @@ import { InventoryModule } from './modules/inventory/Inventory.module';
 import { RealtimeModule } from './modules/realtime/realtime.module';
 import { ServicesModule } from './modules/services/services.module';
 import { OrderServiceModule } from './modules/order-service/order-service.module';
+import { InvoiceModule } from './modules/invoice/invoice.module';
 
 @Module({
   imports: [
@@ -85,6 +86,7 @@ import { OrderServiceModule } from './modules/order-service/order-service.module
     RealtimeModule,
     ServicesModule,
     OrderServiceModule,
+    InvoiceModule,
   ],
   controllers: [AppController],
   providers: [
@@ -135,6 +137,7 @@ export class AppModule implements NestModule {
         'services',
         'services/*path',
         'orders-service/*path',
+        'invoices/*path',
       );
   }
 }

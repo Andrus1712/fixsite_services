@@ -11,12 +11,14 @@ import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { SerializeInterceptor } from 'src/common/interceptors/serialize.interceptor';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AssignTechnicianOrderDto } from '../technician/dto/assign-technician-order.dto';
+import { LogEventService } from '../log-events/logs-events.service';
 
 @Controller('orders')
 @UseGuards(TenantSelectionGuard)
 export class OrderController {
   constructor(
     private readonly orderService: OrderService,
+    private readonly logEventService: LogEventService,
   ) { }
 
   @UseInterceptors(new SerializeInterceptor(OrderResponseDto, { excludeExtraneousValues: true }))
@@ -61,6 +63,22 @@ export class OrderController {
         limit: pageSize,
         totalPages: Math.ceil(result.total / pageSize),
       },
+    };
+  }
+
+  @Get(':order_code/log-events')
+  async getLogEventsByOrderCode(
+    @CurrentTenant() tenant: Tenant,
+    @Param('order_code') orderCode: string,
+  ) {
+    const order = await this.orderService.getOrderInfo(tenant, orderCode);
+    const data = await this.logEventService.getLogsByOrder(tenant, order.id);
+    return {
+      success: true,
+      status: HttpStatus.OK,
+      message: 'Log events consultados correctamente',
+      data,
+      errors: null,
     };
   }
 
@@ -110,6 +128,22 @@ export class OrderController {
       message: "Orden asignada correctamente",
       data,
       errors: null
+    };
+  }
+
+  @Post('/unassign')
+  async unassignTechnicianFromOrder(
+    @CurrentTenant() tenant: Tenant,
+    @CurrentUser() user: any,
+    @Body('order_code') orderCode: string,
+  ) {
+    const data = await this.orderService.unassignOrder(tenant, orderCode, user.username);
+    return {
+      success: true,
+      status: HttpStatus.OK,
+      message: 'Técnico desasignado correctamente',
+      data,
+      errors: null,
     };
   }
 

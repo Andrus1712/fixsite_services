@@ -426,6 +426,65 @@ export class OrderService {
 
     return order;
   }
+  async unassignOrder(tenant: Tenant, orderCode: string, author: string) {
+    const connection = await this.tenantService.getConnection(tenant);
+
+    return await connection.transaction(async (manager) => {
+      const order = await manager.findOne(Order, {
+        where: { order_code: orderCode },
+        relations: ['technician'],
+      });
+
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      if (!order.assigned_technician_id) {
+        throw new BadRequestException('La orden no tiene un técnico asignado');
+      }
+
+      // Solo permitir desasignar si está en PENDING o ASSIGNED
+      const allowedStatuses = [OrderStatusEnum.PENDING, OrderStatusEnum.ASSIGNED];
+      if (!allowedStatuses.includes(order.status as OrderStatusEnum)) {
+        throw new BadRequestException(
+          `No se puede desasignar el técnico cuando la orden está en estado "${ORDER_STATUS_LABELS[order.status as OrderStatusEnum]}". Solo es posible en estados: Pendiente o Asignada.`,
+        );
+      }
+
+      const previousTechnicianId = order.assigned_technician_id;
+
+      await manager
+        .createQueryBuilder()
+        .update(Order)
+        .set({
+          assigned_technician_id: () => 'NULL',
+          status: OrderStatusEnum.PENDING,
+          status_description: ORDER_STATUS_DESCRIPTIONS[OrderStatusEnum.PENDING],
+        })
+        .where('id = :id', { id: order.id })
+        .execute();
+
+      order.assigned_technician_id = null as any;
+      order.status = OrderStatusEnum.PENDING;
+      order.status_description = ORDER_STATUS_DESCRIPTIONS[OrderStatusEnum.PENDING];
+
+      await this.logEventService.logWithManager(manager, {
+        orderId: order.id,
+        type: LogType.ORDER_UNASSIGNED,
+        title: 'Técnico desasignado',
+        description: `Se desasignó el técnico de la orden ${order.order_code}. La orden volvió a estado Pendiente.`,
+        user: author,
+        icon: 'technician_unassigned',
+        metadata: {
+          order_code: order.order_code,
+          previous_technician_id: previousTechnicianId,
+        },
+      });
+
+      return order;
+    });
+  }
+
   async getOrderTimeline(tenant: Tenant, orderCode: string) {
     const connection = await this.tenantService.getConnection(tenant);
     const orderRepo = connection.getRepository(Order);

@@ -37,3 +37,10 @@
 {"timestamp":1779660001488,"command":"npx tsc --noEmit 2>&1 | head -50","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
 {"timestamp":1779849201769,"command":"kirograph_files","originalTokens":2000,"compressedTokens":6,"strategy":"graph:kirograph_files","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
 {"timestamp":1779849201827,"command":"kirograph_architecture","originalTokens":7500,"compressedTokens":263,"strategy":"graph:kirograph_architecture","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780118637705,"command":"kirograph_context","originalTokens":15000,"compressedTokens":160,"strategy":"graph:kirograph_context","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780118641227,"command":"kirograph_search","originalTokens":3300,"compressedTokens":33,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780118641508,"command":"kirograph_search","originalTokens":3300,"compressedTokens":314,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780118699864,"command":"kirograph_node","originalTokens":1500,"compressedTokens":179,"strategy":"graph:kirograph_node","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780118703589,"command":"kirograph_node","originalTokens":1500,"compressedTokens":14,"strategy":"graph:kirograph_node","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780118737466,"command":"npx tsc --noEmit --pretty 2>&1 | head -30","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1780120070006,"command":"npx tsc --noEmit --pretty 2>&1 | head -30","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
