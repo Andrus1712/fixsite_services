@@ -44,3 +44,12 @@
 {"timestamp":1780118703589,"command":"kirograph_node","originalTokens":1500,"compressedTokens":14,"strategy":"graph:kirograph_node","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
 {"timestamp":1780118737466,"command":"npx tsc --noEmit --pretty 2>&1 | head -30","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
 {"timestamp":1780120070006,"command":"npx tsc --noEmit --pretty 2>&1 | head -30","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1780169783867,"command":"kirograph_context","originalTokens":15000,"compressedTokens":679,"strategy":"graph:kirograph_context","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780169786875,"command":"kirograph_node","originalTokens":1500,"compressedTokens":719,"strategy":"graph:kirograph_node","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780169864695,"command":"npx tsc --noEmit --pretty 2>&1 | head -40","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1780169927315,"command":"kirograph_node","originalTokens":1500,"compressedTokens":277,"strategy":"graph:kirograph_node","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780169967825,"command":"npx tsc --noEmit --pretty 2>&1 | head -40","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1780365479071,"command":"kirograph_context","originalTokens":15000,"compressedTokens":557,"strategy":"graph:kirograph_context","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780367124498,"command":"npx tsc --noEmit --pretty 2>&1 | head -30","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1780368690220,"command":"kirograph_context","originalTokens":12000,"compressedTokens":465,"strategy":"graph:kirograph_context","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780369100746,"command":"npx tsc --noEmit 2>&1 | head -30","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}

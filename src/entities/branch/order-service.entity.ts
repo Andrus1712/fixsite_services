@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   ManyToMany,
+  OneToMany,
   JoinColumn,
   JoinTable,
   CreateDateColumn,
@@ -12,6 +13,8 @@ import {
 import { Order } from './order.entity';
 import { Service } from './service.entity';
 import { OrderIssue } from './issue.entity';
+import { MaterialIssue } from './material-issues.entity';
+import { OrderServicePart } from './order-service-part.entity';
 
 @Entity('order_services')
 export class OrderService {
@@ -48,6 +51,16 @@ export class OrderService {
 
   @Column('text', { nullable: true })
   notes: string;
+
+  @Column({ nullable: true })
+  material_issue_id: number;
+
+  @ManyToOne(() => MaterialIssue, { nullable: true })
+  @JoinColumn({ name: 'material_issue_id' })
+  materialIssue: MaterialIssue;
+
+  @OneToMany(() => OrderServicePart, (osp) => osp.orderService)
+  parts: OrderServicePart[];
 
   @CreateDateColumn()
   createdAt: Date;

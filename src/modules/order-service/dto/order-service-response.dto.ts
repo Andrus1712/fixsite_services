@@ -1,5 +1,46 @@
 import { Expose, Transform, Type } from 'class-transformer';
 
+export class OrderServicePartArticleDto {
+  @Expose()
+  id: number;
+
+  @Expose()
+  name: string;
+
+  @Expose()
+  sku: string;
+}
+
+export class OrderServicePartStoreDto {
+  @Expose()
+  id: number;
+
+  @Expose()
+  name: string;
+}
+
+export class OrderServicePartResponseDto {
+  @Expose()
+  id: number;
+
+  @Expose()
+  article_id: number;
+
+  @Expose()
+  quantity: number;
+
+  @Expose()
+  store_id: number;
+
+  @Expose()
+  @Type(() => OrderServicePartArticleDto)
+  article: OrderServicePartArticleDto;
+
+  @Expose()
+  @Type(() => OrderServicePartStoreDto)
+  store: OrderServicePartStoreDto;
+}
+
 export class OrderServiceIssueResponseDto {
   @Expose()
   id: number;
@@ -68,6 +109,13 @@ export class OrderServiceResponseDto {
   @Expose()
   @Type(() => OrderServiceIssueResponseDto)
   issues: OrderServiceIssueResponseDto[];
+
+  @Expose()
+  material_issue_id: number | null;
+
+  @Expose()
+  @Type(() => OrderServicePartResponseDto)
+  parts: OrderServicePartResponseDto[];
 
   @Expose()
   createdAt: Date;

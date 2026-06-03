@@ -1,4 +1,26 @@
-import { IsInt, IsOptional, IsBoolean, IsNumber, IsString, IsArray } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsNumber,
+  IsString,
+  IsArray,
+  ArrayMaxSize,
+  ValidateNested,
+  Min,
+  Max,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class OrderServicePartDto {
+  @IsInt()
+  @Min(1)
+  article_id: number;
+
+  @IsInt()
+  @Min(1)
+  @Max(10000)
+  quantity: number;
+}
 
 export class CreateOrderServiceDto {
   @IsInt()
@@ -24,4 +46,16 @@ export class CreateOrderServiceDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(50)
+  @ValidateNested({ each: true })
+  @Type(() => OrderServicePartDto)
+  parts?: OrderServicePartDto[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  store_id?: number;
 }

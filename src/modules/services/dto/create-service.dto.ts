@@ -14,4 +14,8 @@ export class CreateServiceDto {
   @IsBoolean()
   @IsOptional()
   is_active?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  requires_articles?: boolean;
 }

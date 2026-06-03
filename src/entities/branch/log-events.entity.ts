@@ -12,6 +12,8 @@ export enum LogType {
     ORDER_CANCELLED = "order_cancelled",
     // Issues (fallas)
     ISSUE_ADDED = "issue_added",
+    ISSUE_UPDATED = "issue_updated",
+    ISSUE_DELETED = "issue_deleted",
     ISSUE_RESOLVED = "issue_resolved",
     ISSUE_REJECTED = "issue_rejected",
     ISSUE_REOPENED = "issue_reopened",

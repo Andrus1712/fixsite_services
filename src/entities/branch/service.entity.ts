@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ServiceOrderType } from './service-order-type.entity';
+import { ServiceArticle } from './service-article.entity';
 
 @Entity('services')
 export class Service {
@@ -18,6 +19,9 @@ export class Service {
   @Column({ default: true })
   is_active: boolean;
 
+  @Column({ default: false })
+  requires_articles: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -26,4 +30,7 @@ export class Service {
 
   @OneToMany(() => ServiceOrderType, sot => sot.service)
   serviceOrderTypes: ServiceOrderType[];
+
+  @OneToMany(() => ServiceArticle, sa => sa.service)
+  serviceArticles: ServiceArticle[];
 }

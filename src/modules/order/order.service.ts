@@ -1,7 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateOrderIssueDto } from './dto/create-order-issue.dto';
-import { Order, Customer, Device, OrderIssue, DeviceModel, Note } from '../../entities/branch';
+import { UpdateOrderIssueDto } from './dto/update-order-issue.dto';
+import { Order, Customer, Device, OrderIssue, DeviceModel, Note, FailureCode } from '../../entities/branch';
+import { OrderIssueStatus } from '../../entities/branch/issue.entity';
 import { Tenant } from '../../entities/global/tenant.entity';
 import { ConnectionDatabaseService } from 'src/database/connection-database.service';
 import { EntityManager } from 'typeorm';
@@ -553,5 +555,83 @@ export class OrderService {
       description: ORDER_STATUS_DESCRIPTIONS[parseInt(item.status) as OrderStatusEnum] || 'unknown',
       label: ORDER_STATUS_LABELS[parseInt(item.status) as OrderStatusEnum] || 'Desconocido',
     }));
+  }
+
+  async updateIssue(tenant: Tenant, issueId: number, dto: UpdateOrderIssueDto, author: string) {
+    const connection = await this.tenantService.getConnection(tenant);
+    const issueRepo = connection.getRepository(OrderIssue);
+
+    const issue = await issueRepo.findOne({ where: { id: issueId }, relations: ['order'] });
+    if (!issue) {
+      throw new NotFoundException(`Falla con ID ${issueId} no encontrada`);
+    }
+
+    if (issue.status !== OrderIssueStatus.PENDING) {
+      throw new BadRequestException('Solo se pueden editar fallas en estado Pendiente');
+    }
+
+    if (dto.failure_code_id !== undefined) {
+      const failureCodeRepo = connection.getRepository(FailureCode);
+      const failureCode = await failureCodeRepo.findOne({ where: { id: dto.failure_code_id } });
+      if (!failureCode) {
+        throw new UnprocessableEntityException(`Código de falla con ID ${dto.failure_code_id} no existe`);
+      }
+    }
+
+    if (dto.title !== undefined) issue.title = dto.title;
+    if (dto.description !== undefined) issue.description = dto.description;
+    if (dto.failure_code_id !== undefined) issue.failure_code_id = dto.failure_code_id;
+    if (dto.additional_notes !== undefined) issue.additional_notes = dto.additional_notes;
+    if (dto.steps_to_reproduce !== undefined) issue.steps_to_reproduce = dto.steps_to_reproduce;
+    if (dto.attachments !== undefined) issue.attachments = dto.attachments as any;
+
+    await issueRepo.save(issue);
+
+    await this.logEventService.log(tenant, {
+      orderId: issue.order_id,
+      type: LogType.ISSUE_UPDATED,
+      title: 'Falla actualizada',
+      description: `Se actualizó la falla "${issue.title}" en la orden ${issue.order?.order_code ?? issue.order_id}.`,
+      user: author,
+      icon: 'issue_updated',
+      metadata: {
+        issue_id: issue.id,
+        issue_title: issue.title,
+        updated_fields: Object.keys(dto).filter(k => dto[k] !== undefined),
+      },
+    });
+  }
+
+  async deleteIssue(tenant: Tenant, issueId: number, author: string) {
+    const connection = await this.tenantService.getConnection(tenant);
+    const issueRepo = connection.getRepository(OrderIssue);
+
+    const issue = await issueRepo.findOne({ where: { id: issueId }, relations: ['order'] });
+    if (!issue) {
+      throw new NotFoundException(`Falla con ID ${issueId} no encontrada`);
+    }
+
+    if (issue.status === OrderIssueStatus.RESOLVED) {
+      throw new BadRequestException('No se puede eliminar una falla resuelta');
+    }
+
+    const issueTitle = issue.title;
+    const orderId = issue.order_id;
+    const orderCode = issue.order?.order_code ?? issue.order_id;
+
+    await issueRepo.remove(issue);
+
+    await this.logEventService.log(tenant, {
+      orderId,
+      type: LogType.ISSUE_DELETED,
+      title: 'Falla eliminada',
+      description: `Se eliminó la falla "${issueTitle}" de la orden ${orderCode}.`,
+      user: author,
+      icon: 'issue_deleted',
+      metadata: {
+        issue_id: issueId,
+        issue_title: issueTitle,
+      },
+    });
   }
 }

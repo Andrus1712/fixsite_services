@@ -1,7 +1,8 @@
-import { Controller, Post, Body, UseGuards, Get, HttpStatus, Param, Query, UseInterceptors, Put } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, HttpStatus, Param, Query, UseInterceptors, Put, Delete, ParseIntPipe } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateOrderIssueDto } from './dto/create-order-issue.dto';
+import { UpdateOrderIssueDto } from './dto/update-order-issue.dto';
 import { CurrentTenant } from '../../common/decorators/current-tenant.decorator';
 import { Tenant } from '../../entities/global/tenant.entity';
 import { TenantSelectionGuard } from '../auth/guards/tenant-selection.guard';
@@ -111,6 +112,39 @@ export class OrderController {
       status: HttpStatus.CREATED,
       message: 'Issue creado exitosamente',
       data,
+      errors: null,
+    };
+  }
+
+  @Put('/issues/:issueId')
+  async updateIssue(
+    @CurrentTenant() tenant: Tenant,
+    @CurrentUser() user: any,
+    @Param('issueId', ParseIntPipe) issueId: number,
+    @Body() dto: UpdateOrderIssueDto,
+  ) {
+    await this.orderService.updateIssue(tenant, issueId, dto, user.username);
+    return {
+      success: true,
+      status: HttpStatus.OK,
+      message: 'Falla actualizada correctamente',
+      data: null,
+      errors: null,
+    };
+  }
+
+  @Delete('/issues/:issueId')
+  async deleteIssue(
+    @CurrentTenant() tenant: Tenant,
+    @CurrentUser() user: any,
+    @Param('issueId', ParseIntPipe) issueId: number,
+  ) {
+    await this.orderService.deleteIssue(tenant, issueId, user.username);
+    return {
+      success: true,
+      status: HttpStatus.OK,
+      message: 'Falla eliminada correctamente',
+      data: null,
       errors: null,
     };
   }
