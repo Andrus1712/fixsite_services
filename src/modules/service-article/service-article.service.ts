@@ -25,7 +25,7 @@ export class ServiceArticleService {
 
         if (filter) {
             qb.andWhere(
-                '(article.name LIKE :filter OR article.sku LIKE :filter)',
+                '(article.name ILIKE :filter OR article.sku ILIKE :filter)',
                 { filter: `%${filter}%` },
             );
         }

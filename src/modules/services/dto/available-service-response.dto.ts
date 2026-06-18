@@ -10,6 +10,14 @@ export class AvailableServiceItemDto {
   code: string;
 
   @Expose()
+  @Transform(({ obj }) => obj.service?.is_active)
+  is_active: boolean;
+
+  @Expose()
+  @Transform(({ obj }) => obj.service?.requires_articles)
+  requires_articles: boolean;
+
+  @Expose()
   @Transform(({ obj }) => obj.service?.description)
   description: string;
 
@@ -41,4 +49,18 @@ export class AvailableServiceItemDto {
     }
     : null)
   failure_code: { id: number; code: string; name: string; description: string } | null;
+
+  @Expose()
+  @Transform(({ obj }) => obj.service?.serviceArticles?.length
+    ? obj.service.serviceArticles.map(sa => ({
+      id: sa.id,
+      article_id: sa.article_id,
+      article_sku: sa.article?.sku ?? null,
+      article_name: sa.article?.name ?? null,
+      default_quantity: sa.default_quantity,
+      article_unit: sa.article.unit_measurement ?? null,
+      is_active: sa.is_active,
+    }))
+    : [])
+  services_articles: { id: number; article_id: number; article_name: string | null; default_quantity: number; is_active: boolean }[]
 }

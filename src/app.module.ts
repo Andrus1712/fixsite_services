@@ -140,6 +140,7 @@ export class AppModule implements NestModule {
         'services/*path',
         'orders-service/*path',
         'service-articles/*path',
+        'service-articles',
         'invoices/*path',
       );
   }

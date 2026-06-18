@@ -53,3 +53,9 @@
 {"timestamp":1780367124498,"command":"npx tsc --noEmit --pretty 2>&1 | head -30","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
 {"timestamp":1780368690220,"command":"kirograph_context","originalTokens":12000,"compressedTokens":465,"strategy":"graph:kirograph_context","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
 {"timestamp":1780369100746,"command":"npx tsc --noEmit 2>&1 | head -30","originalTokens":0,"compressedTokens":0,"strategy":"empty","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1780543440679,"command":"kirograph_context","originalTokens":15000,"compressedTokens":814,"strategy":"graph:kirograph_context","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780543463655,"command":"git log --oneline -30","originalTokens":756,"compressedTokens":646,"strategy":"git:log:oneline","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1780543466708,"command":"git diff b887c40..f2eccb7 --name-only","originalTokens":294,"compressedTokens":0,"strategy":"git:diff","sessionId":"f4a78c5ac3d2d06a","source":"exec"}
+{"timestamp":1780547629500,"command":"kirograph_node","originalTokens":1500,"compressedTokens":165,"strategy":"graph:kirograph_node","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780547636749,"command":"kirograph_search","originalTokens":3300,"compressedTokens":66,"strategy":"graph:kirograph_search","sessionId":"f4a78c5ac3d2d06a","source":"graph"}
+{"timestamp":1780547640429,"command":"kirograph_node","originalTokens":1500,"compressedTokens":20,"strategy":"graph:kirograph_node","sessionId":"f4a78c5ac3d2d06a","source":"graph"}

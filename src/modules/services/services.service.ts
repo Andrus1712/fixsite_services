@@ -191,35 +191,33 @@ export class ServicesService {
     const sotRepo = connection.getRepository(ServiceOrderType);
     const orderServiceRepo = connection.getRepository(OrderService);
 
-    // Resolver los failure_code_id a partir de los IDs de OrderIssue
-    let failureCodeIds: number[] = [];
-
-    if (orderIssueIds?.length) {
-      const rows: { failure_code_id: number }[] = await connection
-        .getRepository('order_issues')
-        .createQueryBuilder('oi')
-        .select('oi.failure_code_id', 'failure_code_id')
-        .where('oi.id IN (:...orderIssueIds)', { orderIssueIds })
-        .andWhere('oi.failure_code_id IS NOT NULL')
-        .distinct(true)
-        .getRawMany();
-
-      failureCodeIds = rows.map(r => r.failure_code_id).filter(id => id != null);
-    }
-
     const qb = sotRepo.createQueryBuilder('sot')
       .leftJoinAndSelect('sot.service', 'service')
+      .leftJoinAndSelect('service.serviceArticles', 'serviceArticle')
+      .leftJoinAndSelect('serviceArticle.article', 'article')
       .leftJoinAndSelect('sot.orderType', 'orderType')
       .leftJoinAndSelect('sot.failureCode', 'failureCode')
+      .leftJoinAndMapMany(
+        'sot.orderIssues',
+        'order_issues',
+        'oi',
+        'sot.failure_code_id = oi.failure_code_id',
+      )
+      .leftJoin(
+        'order_service_issues',
+        'osi',
+        'osi.order_issue_id = oi.id',
+      )
       .where('sot.order_type_id = :orderTypeId', { orderTypeId })
       .andWhere('sot.is_active = true')
       .andWhere('service.is_active = true');
 
-    if (failureCodeIds.length) {
-      qb.andWhere('sot.failure_code_id IN (:...failureCodeIds)', { failureCodeIds });
-    } else {
-      qb.andWhere('sot.failure_code_id IS NULL');
+    if (orderIssueIds?.length) {
+      qb.andWhere('oi.id IN (:...orderIssueIds)', { orderIssueIds });
     }
+
+    // Excluir ServiceOrderTypes cuyas fallas ya están cubiertas por un OrderService
+    qb.andWhere('osi.order_service_id IS NULL');
 
     if (orderId) {
       const subQuery = orderServiceRepo

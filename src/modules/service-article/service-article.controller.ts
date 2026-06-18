@@ -14,10 +14,11 @@ import {
 import { TenantSelectionGuard } from '../auth/guards/tenant-selection.guard';
 import { CurrentTenant } from '../../common/decorators/current-tenant.decorator';
 import { Tenant } from '../../entities/global/tenant.entity';
-import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { ServiceArticleService } from './service-article.service';
 import { CreateServiceArticleDto } from './dto/create-service-article.dto';
 import { UpdateServiceArticleDto } from './dto/update-service-article.dto';
+import { QueryServiceArticleDto } from './dto/query-service-article.dto';
+
 
 @Controller('service-articles')
 @UseGuards(TenantSelectionGuard)
@@ -27,13 +28,12 @@ export class ServiceArticleController {
     @Get()
     async findAll(
         @CurrentTenant() tenant: Tenant,
-        @Query('service_id', ParseIntPipe) serviceId: number,
-        @Query() query: PaginationQueryDto,
+        @Query() query: QueryServiceArticleDto,
     ) {
-        const { page, limit, filter } = query;
+        const { service_id, page, limit, filter } = query;
         const result = await this.serviceArticleService.findAll(
             tenant,
-            serviceId,
+            service_id,
             page,
             limit,
             filter,
